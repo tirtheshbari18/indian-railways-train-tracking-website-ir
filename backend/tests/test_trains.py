@@ -61,3 +61,14 @@ def test_gujarat_sf_express_22954_route_and_stops(client):
     assert data["stops"][0]["station_code"] == "ADI"
     assert data["stops"][-1]["station_code"] == "MMCT"
 
+def test_tejas_12951_vadodara_schedule(client):
+    response = client.get("/api/v1/trains/12951")
+    assert response.status_code == 200
+    data = response.json()
+    brc_stops = [s for s in data["stops"] if s["station_code"] == "BRC"]
+    assert len(brc_stops) == 1
+    assert brc_stops[0]["arrival_time"] == "21:14"
+    assert brc_stops[0]["departure_time"] == "21:27"
+    assert brc_stops[0]["halt_minutes"] == 13
+
+

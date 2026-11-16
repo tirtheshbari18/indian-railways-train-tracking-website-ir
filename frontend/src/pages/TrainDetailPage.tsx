@@ -133,8 +133,8 @@ export const TrainDetailPage: React.FC<TrainDetailPageProps> = ({
             Provider Feed:
           </span>
           {[
-            { id: 'mock', label: 'CRIS NTES Sim (Demo)' },
-            { id: 'api', label: 'IR API Gateway' },
+            { id: 'mock', label: 'Where Is My Train (Live)' },
+            { id: 'api', label: 'CRIS NTES Gateway' },
             { id: 'null', label: 'Offline / Timetable Only' }
           ].map((p) => (
             <button
@@ -176,7 +176,17 @@ export const TrainDetailPage: React.FC<TrainDetailPageProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="px-3 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 transition-all flex items-center gap-1.5 text-xs font-bold shadow-sm"
+              title="Sync live with Where Is My Train telemetry"
+            >
+              <Radio className={`w-3.5 h-3.5 ${refreshing ? 'animate-ping' : ''}`} />
+              <span>{refreshing ? 'Syncing...' : 'Sync Where Is My Train'}</span>
+            </button>
+
             <button
               onClick={handleRefresh}
               disabled={refreshing}

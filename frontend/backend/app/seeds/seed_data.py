@@ -74,7 +74,7 @@ TRAINS_DATA = [
             {"station_code": "MMCT", "seq": 1, "arr": None, "dep": "17:00", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
             {"station_code": "BVI", "seq": 2, "arr": "17:22", "dep": "17:24", "halt": 2, "dist": 30.0, "day": 1, "plat": "6"},
             {"station_code": "ST", "seq": 3, "arr": "19:43", "dep": "19:48", "halt": 5, "dist": 263.0, "day": 1, "plat": "1"},
-            {"station_code": "BRC", "seq": 4, "arr": "21:06", "dep": "21:16", "halt": 10, "dist": 392.0, "day": 1, "plat": "2"},
+            {"station_code": "BRC", "seq": 4, "arr": "21:14", "dep": "21:27", "halt": 13, "dist": 392.0, "day": 1, "plat": "2"},
             {"station_code": "RTM", "seq": 5, "arr": "00:25", "dep": "00:28", "halt": 3, "dist": 653.0, "day": 2, "plat": "5"},
             {"station_code": "KOTA", "seq": 6, "arr": "03:15", "dep": "03:20", "halt": 5, "dist": 920.0, "day": 2, "plat": "1"},
             {"station_code": "NDLS", "seq": 7, "arr": "08:32", "dep": None, "halt": 0, "dist": 1384.0, "day": 2, "plat": "1"}

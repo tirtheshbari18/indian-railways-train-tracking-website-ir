@@ -1,7 +1,8 @@
-import React from 'react';
-import { Clock, MapPin, CheckCircle2, Circle, AlertCircle, Compass } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, MapPin, CheckCircle2, Circle, AlertCircle, Compass, ChevronDown, ChevronUp, Info, X } from 'lucide-react';
 import { LiveStatusStop } from '../types';
 import { StatusBadge } from './StatusBadge';
+import { getIntermediateStations, estimatePassingTime, IntermediateStation } from '../data/intermediateStations';
 
 interface RouteTimelineProps {
   stops: LiveStatusStop[];
@@ -24,6 +25,13 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
   nextStation,
   lastReportedStation
 }) => {
+  const [expandedSegments, setExpandedSegments] = useState<Record<string, boolean>>({});
+  const [noIntermediateModal, setNoIntermediateModal] = useState<{
+    isOpen: boolean;
+    fromStation: string;
+    toStation: string;
+  } | null>(null);
+
   if (!stops || stops.length === 0) {
     return (
       <div className="p-8 text-center text-slate-500 bg-slate-900/50 rounded-xl border border-slate-800">
@@ -31,6 +39,30 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
       </div>
     );
   }
+
+  const toggleSegment = (key: string) => {
+    setExpandedSegments(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const handleToggleIntermediate = (
+    key: string,
+    fromStop: LiveStatusStop,
+    toStop: LiveStatusStop,
+    list: IntermediateStation[]
+  ) => {
+    if (list.length === 0) {
+      setNoIntermediateModal({
+        isOpen: true,
+        fromStation: `${fromStop.station_name} (${fromStop.station_code})`,
+        toStation: `${toStop.station_name} (${toStop.station_code})`
+      });
+    } else {
+      toggleSegment(key);
+    }
+  };
 
   // Find moving segment index (last passed stop before first upcoming stop)
   let activeMovingIndex = -1;
@@ -44,20 +76,56 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
   }
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl">
+    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl relative">
+      {/* No Intermediate Stations Modal Popup */}
+      {noIntermediateModal && noIntermediateModal.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl text-center space-y-4 relative">
+            <button
+              onClick={() => setNoIntermediateModal(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <div className="w-12 h-12 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto text-xl font-bold">
+              ℹ️
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-base font-bold text-white">No Intermediate Stations</h3>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                There are no crossing or intermediate way stations between{' '}
+                <strong className="text-amber-400">{noIntermediateModal.fromStation}</strong> and{' '}
+                <strong className="text-amber-400">{noIntermediateModal.toStation}</strong>.
+              </p>
+              <p className="text-[11px] text-slate-400">
+                These two stations are immediately adjacent on this railway corridor with direct point-to-point line tracks.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNoIntermediateModal(null)}
+              className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs transition-colors shadow-md"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2">
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-500" />
-              <span>Route Timetable & Live Where-Is-My-Train Indicator</span>
+              <span>Route Timetable & Interactive Intermediate Stations</span>
             </h3>
             <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
-              IST Real-Time
+              Where Is My Train Engine
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Total {stops.length} halts along route ({stops[stops.length - 1]?.distance_km || 0} km total) • Telemetry synchronized
+            Total {stops.length} scheduled halts • Tap intermediate station pills to expand passing stations along the line
           </p>
         </div>
 
@@ -68,7 +136,7 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
             <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-ping"></span>
-            <span>Live Position</span>
+            <span>Live Moving</span>
           </div>
           <div className="flex items-center gap-1.5 text-slate-400">
             <span className="w-2.5 h-2.5 rounded-full bg-slate-600"></span>
@@ -94,6 +162,13 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
           } else if (isPassed) {
             dotBg = 'bg-emerald-600 border-emerald-400 text-white';
           }
+
+          const nextStop = idx < stops.length - 1 ? stops[idx + 1] : null;
+          const intermediateList = nextStop
+            ? getIntermediateStations(stop.station_code, nextStop.station_code, stop.distance_km, nextStop.distance_km)
+            : [];
+          const segmentKey = nextStop ? `${stop.station_code}-${nextStop.station_code}-${idx}` : '';
+          const isSegmentExpanded = !!expandedSegments[segmentKey];
 
           return (
             <React.Fragment key={stop.station_code + stop.stop_sequence}>
@@ -195,7 +270,7 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
                     </div>
                   </div>
 
-                  {/* Destination Journey Completed Banner (Where Is My Train style) */}
+                  {/* Destination Journey Completed Banner */}
                   {isDestination && isArrived && (
                     <div className="mt-3 pt-3 border-t border-emerald-800/60 flex items-center justify-between text-xs bg-emerald-950/40 p-2.5 rounded-lg">
                       <div className="flex items-center gap-2 text-emerald-300 font-bold">
@@ -236,7 +311,7 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
                 </div>
               </div>
 
-              {/* Where Is My Train Live Moving Train Indicator between stations */}
+              {/* Where Is My Train Live Moving Train Indicator */}
               {idx === activeMovingIndex && (
                 <div className="relative my-2 -ml-2 pl-4 py-2">
                   <div className="p-3.5 rounded-xl border-l-4 border-amber-500 bg-gradient-to-r from-amber-500/20 via-slate-900 to-slate-950 border border-slate-800 shadow-xl flex items-center justify-between gap-4">
@@ -269,6 +344,87 @@ export const RouteTimeline: React.FC<RouteTimelineProps> = ({
                       </span>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {/* Where Is My Train Interactive Intermediate Stations Control */}
+              {nextStop && (
+                <div className="relative my-2 pl-2">
+                  {!isSegmentExpanded ? (
+                    <button
+                      type="button"
+                      onClick={() => handleToggleIntermediate(segmentKey, stop, nextStop, intermediateList)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-semibold bg-slate-950 hover:bg-slate-800 text-slate-400 hover:text-amber-400 border border-slate-800 hover:border-amber-500/50 transition-all shadow-sm group"
+                      title="Click to view intermediate crossing stations"
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-amber-400 transition-colors"></span>
+                      <span>
+                        {intermediateList.length > 0
+                          ? `+ ${intermediateList.length} intermediate stations`
+                          : 'Show intermediate stations'}
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        ({Math.abs(Math.round(nextStop.distance_km - stop.distance_km))} km)
+                      </span>
+                      <ChevronDown className="w-3 h-3 text-slate-500 group-hover:text-amber-400 transition-transform group-hover:translate-y-0.5" />
+                    </button>
+                  ) : (
+                    <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-3.5 space-y-3 my-2 shadow-inner">
+                      <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                        <div className="flex items-center gap-2 text-xs font-mono text-amber-400 font-bold">
+                          <span className="w-2 h-2 rounded-full bg-amber-400"></span>
+                          <span>
+                            {intermediateList.length} Intermediate Crossing Stations ({stop.station_code} ➔ {nextStop.station_code})
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => toggleSegment(segmentKey)}
+                          className="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white border border-slate-700 transition-colors flex items-center gap-1.5 shadow-sm"
+                        >
+                          <span>Hide (Return)</span>
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      <div className="space-y-1 max-h-72 overflow-y-auto pr-1 divide-y divide-slate-900">
+                        {intermediateList.map((instation) => {
+                          const passTime = estimatePassingTime(
+                            instation.distance_km,
+                            stop.distance_km,
+                            nextStop.distance_km,
+                            stop.scheduled_departure || stop.scheduled_arrival,
+                            nextStop.scheduled_arrival || nextStop.scheduled_departure
+                          );
+
+                          return (
+                            <div
+                              key={instation.code}
+                              className="flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-slate-900/60 text-xs transition-colors"
+                            >
+                              <div className="flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+                                <span className="font-semibold text-slate-200">{instation.name}</span>
+                                <span className="font-mono text-[10px] text-amber-400/90 bg-slate-900 px-1 py-0.5 rounded border border-slate-800">
+                                  {instation.code}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-4 text-right font-mono text-xs">
+                                <span className="text-slate-500 text-[11px]">{instation.distance_km} km</span>
+                                <span className="text-slate-300">
+                                  Passing: <strong className="text-amber-400 font-bold">{passTime}</strong>
+                                </span>
+                                <span className="text-[10px] text-slate-500 px-1.5 py-0.5 rounded bg-slate-900">
+                                  No halt
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </React.Fragment>
