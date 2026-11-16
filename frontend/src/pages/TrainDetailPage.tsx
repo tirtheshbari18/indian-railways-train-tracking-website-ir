@@ -42,6 +42,20 @@ export const TrainDetailPage: React.FC<TrainDetailPageProps> = ({
   const [selectedProvider, setSelectedProvider] = useState<string>('mock');
   const [activeView, setActiveView] = useState<'timeline' | 'map'>('timeline');
   const [error, setError] = useState<string | null>(null);
+  const [istTime, setIstTime] = useState<string>('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      // Calculate IST (UTC + 5 hours 30 mins)
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      const istDate = new Date(utc + (330 * 60000));
+      setIstTime(istDate.toLocaleTimeString('en-IN', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }));
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fetchDetails = async (provider = selectedProvider) => {
     try {
@@ -218,11 +232,20 @@ export const TrainDetailPage: React.FC<TrainDetailPageProps> = ({
       <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
               <h2 className="text-sm uppercase tracking-wider font-extrabold text-slate-200">
                 Live Running Status & Telemetry
               </h2>
+              {istTime && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                  <Clock className="w-3 h-3 text-amber-400 animate-pulse" />
+                  IST: {istTime}
+                </span>
+              )}
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">
+                Where-Is-My-Train Synchronized
+              </span>
             </div>
             <p className="text-base font-semibold text-slate-100">
               {liveStatus.current_status_description}
@@ -344,6 +367,11 @@ export const TrainDetailPage: React.FC<TrainDetailPageProps> = ({
           stops={liveStatus.stops}
           onSelectStation={onSelectStation}
           isLiveAvailable={liveStatus.is_live_available}
+          statusSummary={liveStatus.status_summary}
+          speedKmh={liveStatus.speed_kmh}
+          currentStatusDescription={liveStatus.current_status_description}
+          nextStation={liveStatus.next_station}
+          lastReportedStation={liveStatus.last_reported_station}
         />
       ) : (
         <RouteMap
