@@ -36,11 +36,12 @@ export const TrainSearchCard: React.FC<TrainSearchCardProps> = ({
   };
 
   const quickTrains = [
+    { num: '22961', name: 'Mumbai-ADI Vande Bharat' },
+    { num: '22962', name: 'ADI-Mumbai Vande Bharat' },
+    { num: '22954', name: 'Gujarat SF Express' },
     { num: '12951', name: 'Mumbai Tejas Rajdhani' },
-    { num: '22436', name: 'Vande Bharat Express' },
-    { num: '12002', name: 'Bhopal Shatabdi' },
-    { num: '12301', name: 'Howrah Rajdhani' },
-    { num: '20607', name: 'Chennai-Mysuru Vande Bharat' }
+    { num: '22436', name: 'NDLS-Varanasi Vande Bharat' },
+    { num: '12002', name: 'Bhopal Shatabdi' }
   ];
 
   return (

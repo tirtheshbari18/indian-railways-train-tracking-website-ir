@@ -28,6 +28,46 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   const featuredTrains = [
     {
+      num: '22961',
+      name: 'Mumbai Central - Ahmedabad Vande Bharat Express',
+      type: 'Vande Bharat',
+      route: 'MMCT → ADI',
+      dist: '491 km',
+      dur: '5h 30m',
+      days: '6 Days/Week (Mon-Sat)',
+      tag: 'Semi-High Speed'
+    },
+    {
+      num: '22962',
+      name: 'Ahmedabad - Mumbai Central Vande Bharat Express',
+      type: 'Vande Bharat',
+      route: 'ADI → MMCT',
+      dist: '491 km',
+      dur: '5h 40m',
+      days: '6 Days/Week (Mon-Sat)',
+      tag: 'Semi-High Speed'
+    },
+    {
+      num: '22954',
+      name: 'Gujarat Superfast Express',
+      type: 'Superfast',
+      route: 'ADI → MMCT',
+      dist: '491 km',
+      dur: '8h 54m',
+      days: 'Daily',
+      tag: 'WR Western Lifeline'
+    },
+    {
+      num: '22953',
+      name: 'Gujarat Superfast Express',
+      type: 'Superfast',
+      route: 'MMCT → ADI',
+      dist: '491 km',
+      dur: '9h 00m',
+      days: 'Daily',
+      tag: 'WR Western Lifeline'
+    },
+    {
       num: '12951',
       name: 'Mumbai Tejas Rajdhani Express',
       type: 'Rajdhani',

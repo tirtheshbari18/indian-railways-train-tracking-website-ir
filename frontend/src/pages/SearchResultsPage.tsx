@@ -107,7 +107,7 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
           <TrainIcon className="w-10 h-10 text-slate-600 mx-auto" />
           <h3 className="text-base font-bold text-slate-300">No matching trains found</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
-            Try searching for a major terminal code (e.g. NDLS, MMCT, HWH, MAS) or train number (e.g. 12951, 22436, 12002).
+            Try searching for a major terminal code (e.g. MMCT, ADI, NDLS, HWH) or train number (e.g. 22961, 22954, 12951, 22436).
           </p>
           <button
             onClick={onBack}
