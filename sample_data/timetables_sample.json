@@ -1,0 +1,35 @@
+[
+  {
+    "train_number": "12555",
+    "station_code": "GKP",
+    "stop_sequence": 1,
+    "arrival_time": null,
+    "departure_time": "16:35",
+    "halt_minutes": 0,
+    "distance_km": 0.0,
+    "day_number": 1,
+    "platform": "1"
+  },
+  {
+    "train_number": "12555",
+    "station_code": "CNB",
+    "stop_sequence": 2,
+    "arrival_time": "21:40",
+    "departure_time": "21:45",
+    "halt_minutes": 5,
+    "distance_km": 345.0,
+    "day_number": 1,
+    "platform": "1"
+  },
+  {
+    "train_number": "12555",
+    "station_code": "NDLS",
+    "stop_sequence": 3,
+    "arrival_time": "05:50",
+    "departure_time": null,
+    "halt_minutes": 0,
+    "distance_km": 768.0,
+    "day_number": 2,
+    "platform": "6"
+  }
+]

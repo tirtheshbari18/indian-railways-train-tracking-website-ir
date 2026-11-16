@@ -1,0 +1,28 @@
+[
+  {
+    "train_number": "12626",
+    "train_name": "Kerala Superfast Express",
+    "train_type": "Superfast",
+    "source_station_code": "NDLS",
+    "destination_station_code": "TVC",
+    "running_days": "1111111",
+    "total_distance_km": 3035.0,
+    "duration_minutes": 2835,
+    "classes": ["1A", "2A", "3A", "SL"],
+    "pantry_car": true,
+    "return_train_number": "12625"
+  },
+  {
+    "train_number": "12555",
+    "train_name": "Gorakhdham Superfast Express",
+    "train_type": "Superfast",
+    "source_station_code": "GKP",
+    "destination_station_code": "NDLS",
+    "running_days": "1111111",
+    "total_distance_km": 768.0,
+    "duration_minutes": 795,
+    "classes": ["1A", "2A", "3A", "SL"],
+    "pantry_car": true,
+    "return_train_number": "12556"
+  }
+]

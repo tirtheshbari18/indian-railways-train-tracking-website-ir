@@ -1,0 +1,32 @@
+[
+  {
+    "code": "HYB",
+    "name": "Hyderabad Deccan",
+    "division": "Hyderabad",
+    "zone": "SCR",
+    "state": "Telangana",
+    "latitude": 17.3929,
+    "longitude": 78.4697,
+    "platforms_count": 6
+  },
+  {
+    "code": "PUNE",
+    "name": "Pune Junction",
+    "division": "Pune",
+    "zone": "CR",
+    "state": "Maharashtra",
+    "latitude": 18.5284,
+    "longitude": 73.8744,
+    "platforms_count": 6
+  },
+  {
+    "code": "GHY",
+    "name": "Guwahati",
+    "division": "Lumding",
+    "zone": "NFR",
+    "state": "Assam",
+    "latitude": 26.1827,
+    "longitude": 91.7519,
+    "platforms_count": 7
+  }
+]

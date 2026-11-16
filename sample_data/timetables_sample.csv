@@ -1,0 +1,4 @@
+train_number,station_code,stop_sequence,arrival_time,departure_time,halt_minutes,distance_km,day_number,platform
+12555,GKP,1,,16:35,0,0,1,1
+12555,CNB,2,21:40,21:45,5,345,1,1
+12555,NDLS,3,05:50,,0,768,2,6
