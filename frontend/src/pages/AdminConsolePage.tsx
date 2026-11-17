@@ -201,11 +201,17 @@ export const AdminConsolePage: React.FC = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
+            { name: 'Rajdhani Express', count: stats?.rajdhani_count ?? 0, desc: 'Flagship Premier Overnight Services', badge: 'bg-red-500/10 text-red-400 border-red-500/30' },
+            { name: 'Vande Bharat', count: stats?.vande_bharat_count ?? 0, desc: 'Semi-High Speed Trainsets', badge: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30' },
+            { name: 'Shatabdi Express', count: stats?.shatabdi_count ?? 0, desc: 'High-speed Day Intercity Trains', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+            { name: 'Duronto Express', count: stats?.duronto_count ?? 0, desc: 'Point-to-point Non-stop Services', badge: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' },
+            { name: 'Tejas Express', count: stats?.tejas_count ?? 0, desc: 'Modern Semi-High Speed Luxury', badge: 'bg-amber-500/10 text-amber-300 border-amber-500/30' },
+            { name: 'Garib Rath & Humsafar', count: (stats?.garib_rath_count ?? 0) + (stats?.humsafar_count ?? 0), desc: 'Affordable & Smart AC Superfast', badge: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30' },
+            { name: 'Superfast Express', count: stats?.superfast_count ?? 0, desc: 'High-Priority Intercity Corridors', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+            { name: 'Express Trains', count: stats?.express_count ?? 0, desc: 'Mail & Intercity Express', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
             { name: 'MEMU Services', count: stats?.memu_count ?? 0, desc: 'Mainline Electric Multiple Unit', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
             { name: 'DEMU Services', count: stats?.demu_count ?? 0, desc: 'Diesel Multiple Unit', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/30' },
             { name: 'Suburban Locals', count: stats?.local_count ?? 0, desc: 'Western & Central Suburban EMU', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
-            { name: 'Superfast Express', count: stats?.superfast_count ?? 0, desc: 'Rajdhani, Tejas, Vande Bharat, SF', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-            { name: 'Express Trains', count: stats?.express_count ?? 0, desc: 'Mail & Intercity Express', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
             { name: 'Passenger Trains', count: stats?.passenger_count ?? 0, desc: 'Slow & Ordinary Shuttles', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
             { name: 'Mail Express', count: stats?.mail_count ?? 0, desc: 'Long-distance Mail Services', badge: 'bg-violet-500/10 text-violet-400 border-violet-500/30' },
             { name: 'Weekly Trains', count: stats?.weekly_count ?? 0, desc: 'Biweekly & Triweekly Services', badge: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30' },

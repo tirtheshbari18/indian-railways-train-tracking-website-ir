@@ -22,7 +22,7 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
   const { isSaved, toggleSave } = useSavedTrains();
   const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.category || 'ALL');
 
-  const filterCategories = ['ALL', 'Superfast', 'Express', 'MEMU', 'DEMU', 'Local', 'Passenger', 'Special'];
+  const filterCategories = ['ALL', 'Rajdhani', 'Vande Bharat', 'Shatabdi', 'Duronto', 'Superfast', 'Express', 'MEMU', 'DEMU', 'Local', 'Passenger', 'Special'];
 
   const filteredTrains = trains.filter((t) => {
     if (selectedCategory === 'ALL') return true;
@@ -30,6 +30,10 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
     const target = selectedCategory.toLowerCase();
     if (target === 'special') return t.is_special || cat.includes('special');
     if (target === 'local') return cat.includes('local') || cat.includes('emu');
+    if (target === 'rajdhani') return cat.includes('rajdhani');
+    if (target === 'vande bharat') return cat.includes('vande bharat');
+    if (target === 'shatabdi') return cat.includes('shatabdi');
+    if (target === 'duronto') return cat.includes('duronto');
     return cat.includes(target);
   });
 
@@ -143,7 +147,17 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
                       <h3 className="text-base font-bold text-slate-100 group-hover:text-amber-400 transition-colors">
                         {train.train_name}
                       </h3>
+                      {train.short_name && train.short_name !== train.train_name && (
+                        <span className="px-2 py-0.5 rounded text-[11px] font-mono text-slate-300 bg-slate-800 border border-slate-700">
+                          {train.short_name}
+                        </span>
+                      )}
                       <StatusBadge type="trainType" value={train.train_category || train.train_type} />
+                      {train.tags && train.tags.length > 0 && train.tags.filter(t => t.toLowerCase() !== (train.train_category || '').toLowerCase()).slice(0, 3).map((tag) => (
+                        <span key={tag} className="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          {tag}
+                        </span>
+                      ))}
                       {train.is_special && (
                         <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
                           <Sparkles className="w-3 h-3 text-amber-400" />

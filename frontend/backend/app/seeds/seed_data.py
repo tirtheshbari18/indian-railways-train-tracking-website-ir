@@ -140,7 +140,19 @@ STATIONS_DATA = [
     # --- NORTH WESTERN & SOUTH CENTRAL (NWR / SCR) ---
     {"code": "JP", "name": "Jaipur Junction", "state": "Rajasthan", "district": "Jaipur", "division": "Jaipur", "zone": "NWR", "latitude": 26.9208, "longitude": 75.7875, "category": "Junction", "platforms_count": 8, "facilities": ["Pink City Heritage Terminal", "AC Lounges", "Metro Interchange", "Wi-Fi"], "operational_status": "Operational"},
     {"code": "BKN", "name": "Bikaner Junction", "state": "Rajasthan", "district": "Bikaner", "division": "Bikaner", "zone": "NWR", "latitude": 28.0167, "longitude": 73.3119, "category": "Junction", "platforms_count": 6, "facilities": ["Heritage Station", "Waiting Hall", "Wi-Fi"], "operational_status": "Operational"},
-    {"code": "SC", "name": "Secunderabad Junction", "state": "Telangana", "district": "Hyderabad", "division": "Secunderabad", "zone": "SCR", "latitude": 17.4339, "longitude": 78.5042, "category": "Junction", "platforms_count": 10, "facilities": ["Twin City Hub", "AC Lounges", "Metro Interchange", "MMTS Suburban Hub", "Wi-Fi"], "operational_status": "Operational"}
+    {"code": "SC", "name": "Secunderabad Junction", "state": "Telangana", "district": "Hyderabad", "division": "Secunderabad", "zone": "SCR", "latitude": 17.4339, "longitude": 78.5042, "category": "Junction", "platforms_count": 10, "facilities": ["Twin City Hub", "AC Lounges", "Metro Interchange", "MMTS Suburban Hub", "Wi-Fi"], "operational_status": "Operational"},
+
+    # --- ADDITIONAL STRATEGIC JUNCTIONS & INTERCHANGES ---
+    {"code": "SWM", "name": "Sawai Madhopur Junction", "state": "Rajasthan", "district": "Sawai Madhopur", "division": "Kota", "zone": "WCR", "latitude": 25.9928, "longitude": 76.3686, "category": "Junction", "platforms_count": 4, "facilities": ["Ranthambore National Park Gateway", "Waiting Hall", "Wi-Fi", "Rajdhani Stop"], "operational_status": "Operational"},
+    {"code": "MTJ", "name": "Mathura Junction", "state": "Uttar Pradesh", "district": "Mathura", "division": "Agra", "zone": "NCR", "latitude": 27.4924, "longitude": 77.6737, "category": "Junction", "platforms_count": 10, "facilities": ["Major 7-Route Junction", "AC Waiting Hall", "Wi-Fi", "Food Plaza", "Express & Rajdhani Stop"], "operational_status": "Operational"},
+    {"code": "LKO", "name": "Lucknow Charbagh", "state": "Uttar Pradesh", "district": "Lucknow", "division": "Lucknow NR", "zone": "NR", "latitude": 26.8317, "longitude": 80.9234, "category": "Terminal", "platforms_count": 9, "facilities": ["Heritage Architecture", "AC Lounge", "Wi-Fi", "Tejas Express Hub"], "operational_status": "Operational"},
+    {"code": "MAO", "name": "Madgaon Junction", "state": "Goa", "district": "South Goa", "division": "Karwar", "zone": "KR", "latitude": 15.2736, "longitude": 73.9792, "category": "Junction", "platforms_count": 4, "facilities": ["Goa Main Terminus", "AC Lounge", "Wi-Fi", "Prepaid Taxi", "Jan Shatabdi Stop"], "operational_status": "Operational"},
+    {"code": "KRMI", "name": "Karmali", "state": "Goa", "district": "North Goa", "division": "Karwar", "zone": "KR", "latitude": 15.4989, "longitude": 73.9214, "category": "Regular", "platforms_count": 2, "facilities": ["Panaji Gateway", "Waiting Hall", "Tejas Express Stop"], "operational_status": "Operational"},
+    {"code": "DBG", "name": "Darbhanga Junction", "state": "Bihar", "district": "Darbhanga", "division": "Samastipur", "zone": "ECR", "latitude": 26.1522, "longitude": 85.8978, "category": "Junction", "platforms_count": 5, "facilities": ["Mithila Hub", "Amrit Bharat Terminus", "Wi-Fi"], "operational_status": "Operational"},
+    {"code": "GNC", "name": "Gandhinagar Capital", "state": "Gujarat", "district": "Gandhinagar", "division": "Ahmedabad", "zone": "WR", "latitude": 23.2356, "longitude": 72.6394, "category": "Terminal", "platforms_count": 3, "facilities": ["Modern 5-Star Hotel Station", "Vande Bharat Terminus", "Wi-Fi"], "operational_status": "Operational"},
+    {"code": "HAPA", "name": "Hapa", "state": "Gujarat", "district": "Jamnagar", "division": "Rajkot", "zone": "WR", "latitude": 22.4833, "longitude": 70.1333, "category": "Regular", "platforms_count": 3, "facilities": ["Jamnagar Industrial Terminal", "Duronto Stop", "Waiting Room"], "operational_status": "Operational"},
+    {"code": "YPR", "name": "Yesvantpur Junction", "state": "Karnataka", "district": "Bengaluru Urban", "division": "Bengaluru", "zone": "SWR", "latitude": 13.0236, "longitude": 77.5503, "category": "Terminal", "platforms_count": 6, "facilities": ["Satellite Metro Terminal", "AC Lounges", "Duronto/Sampark Kranti Hub", "Wi-Fi"], "operational_status": "Operational"},
+    {"code": "DEE", "name": "Delhi Sarai Rohilla", "state": "Delhi", "district": "Central Delhi", "division": "Delhi", "zone": "NR", "latitude": 28.6664, "longitude": 77.1819, "category": "Terminal", "platforms_count": 7, "facilities": ["Duronto/AC Express Terminus", "AC Waiting Hall", "Wi-Fi"], "operational_status": "Operational"}
 ]
 
 # ==============================================================================
@@ -438,12 +450,101 @@ TRAINS_DATA = [
     },
 
     # --------------------------------------------------------------------------
-    # CATEGORY E: SUPERFAST EXPRESS TRAINS
+    # CATEGORY E: RAJDHANI & PREMIER SUPERFAST EXPRESS TRAINS
     # --------------------------------------------------------------------------
+    {
+        "train_number": "12953",
+        "train_name": "August Kranti Tejas Rajdhani Express",
+        "short_name": "AK Tejas Raj Ex",
+        "train_category": "Rajdhani Express",
+        "train_type": "Rajdhani",
+        "source_station_code": "MMCT",
+        "destination_station_code": "NZM",
+        "running_days": "1111111",
+        "total_distance_km": 1377.0,
+        "duration_minutes": 993,
+        "classes": ["1A", "2A", "3A"],
+        "pantry_car": True,
+        "return_train_number": "12954",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": [
+            "12953",
+            "AK Tejas Raj Ex",
+            "AK Tejas Raj",
+            "August Kranti",
+            "August Kranti Tejas Rajdhani",
+            "August Kranti Rajdhani",
+            "Mumbai Central Nizamuddin Rajdhani",
+            "MMCT NZM"
+        ],
+        "tags": ["Rajdhani", "Tejas", "Premium", "Overnight", "Superfast", "Express"],
+        "stops": [
+            {"station_code": "MMCT", "seq": 1, "arr": None, "dep": "17:10", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
+            {"station_code": "BVI", "seq": 2, "arr": "17:33", "dep": "17:35", "halt": 2, "dist": 30.0, "day": 1, "plat": "6"},
+            {"station_code": "VAPI", "seq": 3, "arr": "19:17", "dep": "19:19", "halt": 2, "dist": 168.0, "day": 1, "plat": "1"},
+            {"station_code": "BL", "seq": 4, "arr": "19:37", "dep": "19:39", "halt": 2, "dist": 194.0, "day": 1, "plat": "2"},
+            {"station_code": "ST", "seq": 5, "arr": "20:30", "dep": "20:35", "halt": 5, "dist": 263.0, "day": 1, "plat": "1"},
+            {"station_code": "BH", "seq": 6, "arr": "21:13", "dep": "21:15", "halt": 2, "dist": 322.0, "day": 1, "plat": "3"},
+            {"station_code": "BRC", "seq": 7, "arr": "22:08", "dep": "22:18", "halt": 10, "dist": 392.0, "day": 1, "plat": "2"},
+            {"station_code": "RTM", "seq": 8, "arr": "01:50", "dep": "01:53", "halt": 3, "dist": 653.0, "day": 2, "plat": "5"},
+            {"station_code": "KOTA", "seq": 9, "arr": "04:35", "dep": "04:40", "halt": 5, "dist": 920.0, "day": 2, "plat": "1"},
+            {"station_code": "SWM", "seq": 10, "arr": "05:43", "dep": "05:45", "halt": 2, "dist": 1028.0, "day": 2, "plat": "1"},
+            {"station_code": "MTJ", "seq": 11, "arr": "07:58", "dep": "08:00", "halt": 2, "dist": 1243.0, "day": 2, "plat": "3"},
+            {"station_code": "NZM", "seq": 12, "arr": "09:43", "dep": None, "halt": 0, "dist": 1377.0, "day": 2, "plat": "6"}
+        ]
+    },
+    {
+        "train_number": "12954",
+        "train_name": "August Kranti Tejas Rajdhani Express",
+        "short_name": "AK Tejas Raj Ex",
+        "train_category": "Rajdhani Express",
+        "train_type": "Rajdhani",
+        "source_station_code": "NZM",
+        "destination_station_code": "MMCT",
+        "running_days": "1111111",
+        "total_distance_km": 1377.0,
+        "duration_minutes": 1000,
+        "classes": ["1A", "2A", "3A"],
+        "pantry_car": True,
+        "return_train_number": "12953",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": [
+            "12954",
+            "AK Tejas Raj Ex",
+            "AK Tejas Raj",
+            "August Kranti",
+            "August Kranti Tejas Rajdhani",
+            "August Kranti Rajdhani",
+            "Nizamuddin Mumbai Central Rajdhani",
+            "NZM MMCT"
+        ],
+        "tags": ["Rajdhani", "Tejas", "Premium", "Overnight", "Superfast", "Express"],
+        "stops": [
+            {"station_code": "NZM", "seq": 1, "arr": None, "dep": "17:15", "halt": 0, "dist": 0.0, "day": 1, "plat": "6"},
+            {"station_code": "MTJ", "seq": 2, "arr": "18:43", "dep": "18:45", "halt": 2, "dist": 134.0, "day": 1, "plat": "1"},
+            {"station_code": "SWM", "seq": 3, "arr": "20:48", "dep": "20:50", "halt": 2, "dist": 349.0, "day": 1, "plat": "2"},
+            {"station_code": "KOTA", "seq": 4, "arr": "22:00", "dep": "22:10", "halt": 10, "dist": 457.0, "day": 1, "plat": "2"},
+            {"station_code": "RTM", "seq": 5, "arr": "01:05", "dep": "01:15", "halt": 10, "dist": 724.0, "day": 2, "plat": "4"},
+            {"station_code": "BRC", "seq": 6, "arr": "04:39", "dep": "04:49", "halt": 10, "dist": 985.0, "day": 2, "plat": "1"},
+            {"station_code": "BH", "seq": 7, "arr": "05:36", "dep": "05:38", "halt": 2, "dist": 1055.0, "day": 2, "plat": "4"},
+            {"station_code": "ST", "seq": 8, "arr": "06:13", "dep": "06:18", "halt": 5, "dist": 1114.0, "day": 2, "plat": "2"},
+            {"station_code": "BL", "seq": 9, "arr": "07:10", "dep": "07:12", "halt": 2, "dist": 1183.0, "day": 2, "plat": "3"},
+            {"station_code": "VAPI", "seq": 10, "arr": "07:30", "dep": "07:32", "halt": 2, "dist": 1209.0, "day": 2, "plat": "2"},
+            {"station_code": "BVI", "seq": 11, "arr": "09:10", "dep": "09:12", "halt": 2, "dist": 1347.0, "day": 2, "plat": "7"},
+            {"station_code": "MMCT", "seq": 12, "arr": "09:55", "dep": None, "halt": 0, "dist": 1377.0, "day": 2, "plat": "1"}
+        ]
+    },
     {
         "train_number": "12951",
         "train_name": "Mumbai Tejas Rajdhani Express",
-        "train_category": "Superfast",
+        "short_name": "Tejas Rajdhani",
+        "train_category": "Rajdhani Express",
         "train_type": "Rajdhani",
         "source_station_code": "MMCT",
         "destination_station_code": "NDLS",
@@ -454,7 +555,11 @@ TRAINS_DATA = [
         "pantry_car": True,
         "return_train_number": "12952",
         "is_special": False,
+        "is_active": True,
         "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12951", "Mumbai Tejas Rajdhani", "Tejas Rajdhani", "Mumbai Rajdhani", "MMCT NDLS", "Mumbai Delhi Rajdhani"],
+        "tags": ["Rajdhani", "Tejas", "Premium", "Overnight", "Superfast"],
         "stops": [
             {"station_code": "MMCT", "seq": 1, "arr": None, "dep": "17:00", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
             {"station_code": "BVI", "seq": 2, "arr": "17:22", "dep": "17:24", "halt": 2, "dist": 30.0, "day": 1, "plat": "6"},
@@ -468,7 +573,8 @@ TRAINS_DATA = [
     {
         "train_number": "12952",
         "train_name": "New Delhi - Mumbai Tejas Rajdhani Express",
-        "train_category": "Superfast",
+        "short_name": "Tejas Rajdhani",
+        "train_category": "Rajdhani Express",
         "train_type": "Rajdhani",
         "source_station_code": "NDLS",
         "destination_station_code": "MMCT",
@@ -479,7 +585,11 @@ TRAINS_DATA = [
         "pantry_car": True,
         "return_train_number": "12951",
         "is_special": False,
+        "is_active": True,
         "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12952", "Delhi Mumbai Tejas Rajdhani", "Tejas Rajdhani", "NDLS MMCT", "Delhi Mumbai Rajdhani"],
+        "tags": ["Rajdhani", "Tejas", "Premium", "Overnight", "Superfast"],
         "stops": [
             {"station_code": "NDLS", "seq": 1, "arr": None, "dep": "16:55", "halt": 0, "dist": 0.0, "day": 1, "plat": "3"},
             {"station_code": "KOTA", "seq": 2, "arr": "21:30", "dep": "21:40", "halt": 10, "dist": 465.0, "day": 1, "plat": "1"},
@@ -488,6 +598,210 @@ TRAINS_DATA = [
             {"station_code": "ST", "seq": 5, "arr": "05:13", "dep": "05:18", "halt": 5, "dist": 1122.0, "day": 2, "plat": "2"},
             {"station_code": "BVI", "seq": 6, "arr": "07:40", "dep": "07:42", "halt": 2, "dist": 1354.0, "day": 2, "plat": "7"},
             {"station_code": "MMCT", "seq": 7, "arr": "08:35", "dep": None, "halt": 0, "dist": 1384.0, "day": 2, "plat": "1"}
+        ]
+    },
+    {
+        "train_number": "12002",
+        "train_name": "New Delhi - Rani Kamlapati (Bhopal) Shatabdi Express",
+        "short_name": "Bhopal Shatabdi",
+        "train_category": "Shatabdi Express",
+        "train_type": "Shatabdi",
+        "source_station_code": "NDLS",
+        "destination_station_code": "RKMP",
+        "running_days": "1111111",
+        "total_distance_km": 707.0,
+        "duration_minutes": 510,
+        "classes": ["EC", "CC"],
+        "pantry_car": True,
+        "return_train_number": "12001",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12002", "Bhopal Shatabdi", "NDLS RKMP", "Delhi Bhopal Shatabdi", "Shatabdi Express"],
+        "tags": ["Shatabdi", "Day Train", "High Speed", "Superfast", "Express"],
+        "stops": [
+            {"station_code": "NDLS", "seq": 1, "arr": None, "dep": "06:00", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
+            {"station_code": "MTJ", "seq": 2, "arr": "07:19", "dep": "07:20", "halt": 1, "dist": 141.0, "day": 1, "plat": "1"},
+            {"station_code": "AGC", "seq": 3, "arr": "07:50", "dep": "07:55", "halt": 5, "dist": 195.0, "day": 1, "plat": "1"},
+            {"station_code": "GWL", "seq": 4, "arr": "09:23", "dep": "09:28", "halt": 5, "dist": 313.0, "day": 1, "plat": "1"},
+            {"station_code": "VGLJ", "seq": 5, "arr": "10:45", "dep": "10:50", "halt": 5, "dist": 410.0, "day": 1, "plat": "1"},
+            {"station_code": "BPL", "seq": 6, "arr": "14:07", "dep": "14:12", "halt": 5, "dist": 701.0, "day": 1, "plat": "1"},
+            {"station_code": "RKMP", "seq": 7, "arr": "14:30", "dep": None, "halt": 0, "dist": 707.0, "day": 1, "plat": "1"}
+        ]
+    },
+    {
+        "train_number": "12051",
+        "train_name": "Mumbai CSMT - Madgaon Jan Shatabdi Express",
+        "short_name": "Jan Shatabdi Ex",
+        "train_category": "Jan Shatabdi",
+        "train_type": "Jan Shatabdi",
+        "source_station_code": "CSMT",
+        "destination_station_code": "MAO",
+        "running_days": "1111111",
+        "total_distance_km": 571.0,
+        "duration_minutes": 520,
+        "classes": ["CC", "2S"],
+        "pantry_car": False,
+        "return_train_number": "12052",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12051", "Madgaon Jan Shatabdi", "Goa Jan Shatabdi", "CSMT MAO", "Jan Shatabdi Express"],
+        "tags": ["Jan Shatabdi", "Konkan Railway", "Express", "Day Train"],
+        "stops": [
+            {"station_code": "CSMT", "seq": 1, "arr": None, "dep": "05:10", "halt": 0, "dist": 0.0, "day": 1, "plat": "18"},
+            {"station_code": "DR", "seq": 2, "arr": "05:22", "dep": "05:25", "halt": 3, "dist": 9.0, "day": 1, "plat": "4"},
+            {"station_code": "TNA", "seq": 3, "arr": "05:48", "dep": "05:50", "halt": 2, "dist": 34.0, "day": 1, "plat": "7"},
+            {"station_code": "PNVL", "seq": 4, "arr": "06:23", "dep": "06:25", "halt": 2, "dist": 69.0, "day": 1, "plat": "7"},
+            {"station_code": "KRMI", "seq": 5, "arr": "13:20", "dep": "13:22", "halt": 2, "dist": 540.0, "day": 1, "plat": "1"},
+            {"station_code": "MAO", "seq": 6, "arr": "14:10", "dep": None, "halt": 0, "dist": 571.0, "day": 1, "plat": "1"}
+        ]
+    },
+    {
+        "train_number": "12267",
+        "train_name": "Mumbai Central - Hapa AC Duronto Express",
+        "short_name": "Hapa Duronto",
+        "train_category": "Duronto Express",
+        "train_type": "Duronto",
+        "source_station_code": "MMCT",
+        "destination_station_code": "HAPA",
+        "running_days": "1111111",
+        "total_distance_km": 807.0,
+        "duration_minutes": 715,
+        "classes": ["1A", "2A", "3A"],
+        "pantry_car": True,
+        "return_train_number": "12268",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12267", "Mumbai Hapa Duronto", "Duronto Express", "MMCT HAPA"],
+        "tags": ["Duronto", "AC Express", "Non-stop", "Premium", "Overnight"],
+        "stops": [
+            {"station_code": "MMCT", "seq": 1, "arr": None, "dep": "23:00", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
+            {"station_code": "ST", "seq": 2, "arr": "02:37", "dep": "02:42", "halt": 5, "dist": 263.0, "day": 2, "plat": "1"},
+            {"station_code": "BRC", "seq": 3, "arr": "04:14", "dep": "04:24", "halt": 10, "dist": 392.0, "day": 2, "plat": "3"},
+            {"station_code": "ADI", "seq": 4, "arr": "05:55", "dep": "06:05", "halt": 10, "dist": 491.0, "day": 2, "plat": "1"},
+            {"station_code": "HAPA", "seq": 5, "arr": "10:55", "dep": None, "halt": 0, "dist": 807.0, "day": 2, "plat": "1"}
+        ]
+    },
+    {
+        "train_number": "12909",
+        "train_name": "Bandra Terminus - Hazrat Nizamuddin Garib Rath Express",
+        "short_name": "NZM Garib Rath",
+        "train_category": "Garib Rath",
+        "train_type": "Garib Rath",
+        "source_station_code": "BDTS",
+        "destination_station_code": "NZM",
+        "running_days": "0101010",
+        "total_distance_km": 1367.0,
+        "duration_minutes": 1000,
+        "classes": ["3A", "CC"],
+        "pantry_car": False,
+        "return_train_number": "12910",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12909", "Delhi Garib Rath", "Garib Rath Express", "BDTS NZM"],
+        "tags": ["Garib Rath", "AC 3 Tier", "Affordable AC", "Superfast"],
+        "stops": [
+            {"station_code": "BDTS", "seq": 1, "arr": None, "dep": "17:30", "halt": 0, "dist": 0.0, "day": 1, "plat": "4"},
+            {"station_code": "BVI", "seq": 2, "arr": "17:55", "dep": "17:59", "halt": 4, "dist": 19.0, "day": 1, "plat": "8"},
+            {"station_code": "ST", "seq": 3, "arr": "20:47", "dep": "20:52", "halt": 5, "dist": 252.0, "day": 1, "plat": "1"},
+            {"station_code": "BRC", "seq": 4, "arr": "22:19", "dep": "22:29", "halt": 10, "dist": 381.0, "day": 1, "plat": "2"},
+            {"station_code": "RTM", "seq": 5, "arr": "02:15", "dep": "02:20", "halt": 5, "dist": 642.0, "day": 2, "plat": "5"},
+            {"station_code": "KOTA", "seq": 6, "arr": "05:20", "dep": "05:30", "halt": 10, "dist": 909.0, "day": 2, "plat": "1"},
+            {"station_code": "MTJ", "seq": 7, "arr": "08:18", "dep": "08:20", "halt": 2, "dist": 1233.0, "day": 2, "plat": "3"},
+            {"station_code": "NZM", "seq": 8, "arr": "10:10", "dep": None, "halt": 0, "dist": 1367.0, "day": 2, "plat": "6"}
+        ]
+    },
+    {
+        "train_number": "12907",
+        "train_name": "Maharashtra Sampark Kranti Express",
+        "short_name": "MH Sampark Kranti",
+        "train_category": "Sampark Kranti",
+        "train_type": "Sampark Kranti",
+        "source_station_code": "BDTS",
+        "destination_station_code": "NZM",
+        "running_days": "0010001",
+        "total_distance_km": 1367.0,
+        "duration_minutes": 985,
+        "classes": ["1A", "2A", "3A", "SL"],
+        "pantry_car": True,
+        "return_train_number": "12908",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["12907", "Sampark Kranti", "BDTS NZM", "Maharashtra Sampark Kranti"],
+        "tags": ["Sampark Kranti", "Superfast", "Express", "Biweekly"],
+        "stops": [
+            {"station_code": "BDTS", "seq": 1, "arr": None, "dep": "17:30", "halt": 0, "dist": 0.0, "day": 1, "plat": "4"},
+            {"station_code": "BVI", "seq": 2, "arr": "17:55", "dep": "17:59", "halt": 4, "dist": 19.0, "day": 1, "plat": "8"},
+            {"station_code": "ST", "seq": 3, "arr": "20:47", "dep": "20:52", "halt": 5, "dist": 252.0, "day": 1, "plat": "1"},
+            {"station_code": "BRC", "seq": 4, "arr": "22:19", "dep": "22:29", "halt": 10, "dist": 381.0, "day": 1, "plat": "2"},
+            {"station_code": "KOTA", "seq": 5, "arr": "05:20", "dep": "05:30", "halt": 10, "dist": 909.0, "day": 2, "plat": "1"},
+            {"station_code": "NZM", "seq": 6, "arr": "09:55", "dep": None, "halt": 0, "dist": 1367.0, "day": 2, "plat": "6"}
+        ]
+    },
+    {
+        "train_number": "22119",
+        "train_name": "Mumbai CSMT - Karmali Tejas Express",
+        "short_name": "Goa Tejas Ex",
+        "train_category": "Tejas Express",
+        "train_type": "Tejas",
+        "source_station_code": "CSMT",
+        "destination_station_code": "KRMI",
+        "running_days": "0101010",
+        "total_distance_km": 552.0,
+        "duration_minutes": 510,
+        "classes": ["EC", "CC"],
+        "pantry_car": True,
+        "return_train_number": "22120",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["22119", "CSMT Karmali Tejas", "Goa Tejas", "CSMT KRMI", "Tejas Express"],
+        "tags": ["Tejas", "Premium", "Konkan Railway", "Day Train", "Superfast"],
+        "stops": [
+            {"station_code": "CSMT", "seq": 1, "arr": None, "dep": "05:50", "halt": 0, "dist": 0.0, "day": 1, "plat": "18"},
+            {"station_code": "DR", "seq": 2, "arr": "06:00", "dep": "06:02", "halt": 2, "dist": 9.0, "day": 1, "plat": "4"},
+            {"station_code": "TNA", "seq": 3, "arr": "06:23", "dep": "06:25", "halt": 2, "dist": 34.0, "day": 1, "plat": "7"},
+            {"station_code": "PNVL", "seq": 4, "arr": "06:55", "dep": "06:57", "halt": 2, "dist": 69.0, "day": 1, "plat": "7"},
+            {"station_code": "KRMI", "seq": 5, "arr": "14:20", "dep": None, "halt": 0, "dist": 552.0, "day": 1, "plat": "1"}
+        ]
+    },
+    {
+        "train_number": "15557",
+        "train_name": "Darbhanga - Anand Vihar Terminal Amrit Bharat Express",
+        "short_name": "Amrit Bharat Ex",
+        "train_category": "Amrit Bharat",
+        "train_type": "Amrit Bharat",
+        "source_station_code": "DBG",
+        "destination_station_code": "ANVT",
+        "running_days": "0100100",
+        "total_distance_km": 1137.0,
+        "duration_minutes": 1280,
+        "classes": ["SL", "2S"],
+        "pantry_car": False,
+        "return_train_number": "15558",
+        "is_special": False,
+        "is_active": True,
+        "source_of_data": "CRIS / NTES Official Timetable",
+        "last_verified_date": "2026-11-17",
+        "aliases": ["15557", "Amrit Bharat Express", "Darbhanga Delhi Amrit Bharat", "DBG ANVT"],
+        "tags": ["Amrit Bharat", "Push Pull", "Affordable", "Superfast"],
+        "stops": [
+            {"station_code": "DBG", "seq": 1, "arr": None, "dep": "15:00", "halt": 0, "dist": 0.0, "day": 1, "plat": "1"},
+            {"station_code": "PNBE", "seq": 2, "arr": "18:45", "dep": "18:55", "halt": 10, "dist": 147.0, "day": 1, "plat": "4"},
+            {"station_code": "DDU", "seq": 3, "arr": "22:15", "dep": "22:25", "halt": 10, "dist": 358.0, "day": 1, "plat": "6"},
+            {"station_code": "PRYJ", "seq": 4, "arr": "01:00", "dep": "01:05", "halt": 5, "dist": 511.0, "day": 2, "plat": "2"},
+            {"station_code": "CNB", "seq": 5, "arr": "03:30", "dep": "03:35", "halt": 5, "dist": 705.0, "day": 2, "plat": "1"},
+            {"station_code": "ANVT", "seq": 6, "arr": "12:20", "dep": None, "halt": 0, "dist": 1137.0, "day": 2, "plat": "7"}
         ]
     },
     {
@@ -1015,6 +1329,18 @@ def seed_database(db: Session):
         stops_info = t_data.pop("stops", [])
         train_num = t_data["train_number"]
 
+        if "short_name" not in t_data or not t_data["short_name"]:
+            t_data["short_name"] = t_data["train_name"][:30]
+        if "aliases" not in t_data or not t_data["aliases"]:
+            t_data["aliases"] = [
+                t_data["train_number"],
+                t_data["train_name"],
+                f"{t_data['source_station_code']} {t_data['destination_station_code']}",
+                f"{t_data['source_station_code']} to {t_data['destination_station_code']}"
+            ]
+        if "tags" not in t_data or not t_data["tags"]:
+            t_data["tags"] = [t_data.get("train_category", "Express"), t_data.get("train_type", "Express")]
+
         existing_train = db.query(Train).filter(Train.train_number == train_num).first()
         if existing_train:
             for k, v in t_data.items():
@@ -1025,8 +1351,13 @@ def seed_database(db: Session):
             db.add(train)
             db.flush()
 
-        # Update / Insert Stops
+        # Update / Insert Stops with distance_from_prev computation
+        prev_dist = 0.0
         for s in stops_info:
+            dist = float(s["dist"])
+            dist_from_prev = s.get("distance_from_prev", round(dist - prev_dist, 1) if dist >= prev_dist else 0.0)
+            prev_dist = dist
+
             existing_stop = db.query(Stop).filter(
                 Stop.train_id == train.id,
                 Stop.stop_sequence == s["seq"]
@@ -1038,6 +1369,7 @@ def seed_database(db: Session):
                 existing_stop.departure_time = s["dep"]
                 existing_stop.halt_minutes = s["halt"]
                 existing_stop.distance_km = s["dist"]
+                existing_stop.distance_from_prev = dist_from_prev
                 existing_stop.day_number = s["day"]
                 existing_stop.platform = s["plat"]
             else:
@@ -1049,6 +1381,7 @@ def seed_database(db: Session):
                     departure_time=s["dep"],
                     halt_minutes=s["halt"],
                     distance_km=s["dist"],
+                    distance_from_prev=dist_from_prev,
                     day_number=s["day"],
                     platform=s["plat"]
                 )

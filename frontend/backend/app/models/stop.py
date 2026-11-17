@@ -16,7 +16,8 @@ class Stop(Base):
     arrival_time = Column(String(10), nullable=True)             # "HH:MM" e.g. "16:55", null for origin
     departure_time = Column(String(10), nullable=True)           # "HH:MM" e.g. "17:00", null for destination
     halt_minutes = Column(Integer, default=0)
-    distance_km = Column(Float, default=0.0)
+    distance_km = Column(Float, default=0.0)                     # Cumulative distance from origin
+    distance_from_prev = Column(Float, default=0.0)              # Distance from previous stopping station
     day_number = Column(Integer, default=1)
     platform = Column(String(10), nullable=True)                 # Scheduled platform e.g. "1", "16"
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

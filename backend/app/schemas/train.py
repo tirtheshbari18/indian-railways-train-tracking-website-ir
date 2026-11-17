@@ -10,6 +10,7 @@ class StopBase(BaseModel):
     departure_time: Optional[str] = None
     halt_minutes: int = 0
     distance_km: float = 0.0
+    distance_from_prev: float = 0.0
     day_number: int = 1
     platform: Optional[str] = None
 
@@ -24,7 +25,8 @@ class StopResponse(StopBase):
 class TrainBase(BaseModel):
     train_number: str = Field(..., min_length=4, max_length=10)
     train_name: str = Field(..., min_length=2, max_length=150)
-    train_category: str = "Superfast" # "MEMU", "DEMU", "EMU", "Local", "Superfast", "Express", "Passenger", "Mail Express", "Weekly", "Special"
+    short_name: Optional[str] = None
+    train_category: str = "Superfast" # "Rajdhani Express", "Vande Bharat", "Shatabdi", "MEMU", "DEMU", "Local", "Superfast", etc.
     train_type: str = "Superfast"
     source_station_code: str
     destination_station_code: str
@@ -40,12 +42,15 @@ class TrainBase(BaseModel):
     is_active: bool = True
     source_of_data: Optional[str] = "CRIS / NTES Official Timetable"
     last_verified_date: Optional[str] = None
+    aliases: Optional[List[str]] = None
+    tags: Optional[List[str]] = None
 
 class TrainCreate(TrainBase):
     stops: Optional[List[StopCreate]] = None
 
 class TrainUpdate(BaseModel):
     train_name: Optional[str] = None
+    short_name: Optional[str] = None
     train_category: Optional[str] = None
     train_type: Optional[str] = None
     source_station_code: Optional[str] = None
@@ -60,6 +65,8 @@ class TrainUpdate(BaseModel):
     validity_end: Optional[str] = None
     is_special: Optional[bool] = None
     is_active: Optional[bool] = None
+    aliases: Optional[List[str]] = None
+    tags: Optional[List[str]] = None
 
 class TrainResponse(TrainBase):
     id: int
@@ -72,11 +79,11 @@ class TrainDetailResponse(TrainResponse):
     stops: List[StopResponse] = []
 
 class TrainSearchQuery(BaseModel):
-    query: Optional[str] = None # train number or name
+    query: Optional[str] = None # train number, name, alias, or route
     source: Optional[str] = None
     destination: Optional[str] = None
     station: Optional[str] = None
-    category: Optional[str] = None # "MEMU", "DEMU", "Local", "Superfast", etc.
+    category: Optional[str] = None
     train_type: Optional[str] = None
     day: Optional[str] = None
     page: int = 1

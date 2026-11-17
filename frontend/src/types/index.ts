@@ -23,6 +23,7 @@ export interface Stop {
   departure_time?: string | null;
   halt_minutes: number;
   distance_km: number;
+  distance_from_prev?: number;
   day_number: number;
   platform?: string | null;
   station?: Station;
@@ -32,6 +33,7 @@ export interface Train {
   id: number;
   train_number: string;
   train_name: string;
+  short_name?: string | null;
   train_type: string;
   train_category?: string;
   source_station_code: string;
@@ -48,6 +50,8 @@ export interface Train {
   is_active?: boolean;
   source_of_data?: string;
   last_verified_date?: string | null;
+  aliases?: string[] | null;
+  tags?: string[] | null;
   source_station?: Station;
   destination_station?: Station;
   stops?: Stop[];
@@ -170,6 +174,15 @@ export interface AdminStats {
   mail_count?: number;
   weekly_count?: number;
   special_count?: number;
+  rajdhani_count?: number;
+  shatabdi_count?: number;
+  vande_bharat_count?: number;
+  duronto_count?: number;
+  garib_rath_count?: number;
+  tejas_count?: number;
+  humsafar_count?: number;
+  total_route_records?: number;
+  total_route_stops?: number;
   trains_by_category?: Record<string, number>;
   stations_by_zone?: Record<string, number>;
   stations_by_division?: Record<string, number>;

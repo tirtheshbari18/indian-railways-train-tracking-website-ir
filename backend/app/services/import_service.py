@@ -160,9 +160,24 @@ def validate_trains_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[Li
         is_spec = str(row.get("is_special", "")).lower() in ["true", "1", "yes"]
         category = row.get("train_category") or row.get("train_type") or "Superfast Express"
 
+        raw_aliases = row.get("aliases")
+        aliases = []
+        if isinstance(raw_aliases, list):
+            aliases = raw_aliases
+        elif isinstance(raw_aliases, str) and raw_aliases.strip():
+            aliases = [a.strip() for a in raw_aliases.split(",") if a.strip()]
+
+        raw_tags = row.get("tags")
+        tags = []
+        if isinstance(raw_tags, list):
+            tags = raw_tags
+        elif isinstance(raw_tags, str) and raw_tags.strip():
+            tags = [t.strip() for t in raw_tags.split(",") if t.strip()]
+
         valid_records.append({
             "train_number": train_num,
             "train_name": train_name,
+            "short_name": row.get("short_name"),
             "train_type": row.get("train_type") or "Superfast",
             "train_category": category,
             "source_station_code": src_code,
@@ -177,7 +192,9 @@ def validate_trains_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[Li
             "validity_end": row.get("validity_end"),
             "is_special": is_spec,
             "is_active": str(row.get("is_active", "true")).lower() not in ["false", "0", "no"],
-            "source_of_data": row.get("source_of_data") or "CRIS_OFFICIAL"
+            "source_of_data": row.get("source_of_data") or "CRIS_OFFICIAL",
+            "aliases": aliases,
+            "tags": tags
         })
 
     return valid_records, errors
@@ -240,6 +257,13 @@ def validate_timetables_data(db: Session, records: List[Dict[str, Any]]) -> Tupl
         except Exception:
             day = 1
 
+        prev_dist = 0.0
+        try:
+            if row.get("distance_from_prev"):
+                prev_dist = float(row.get("distance_from_prev"))
+        except Exception:
+            prev_dist = 0.0
+
         valid_records.append({
             "train_id": existing_trains[train_num],
             "train_number": train_num,
@@ -249,6 +273,7 @@ def validate_timetables_data(db: Session, records: List[Dict[str, Any]]) -> Tupl
             "departure_time": dep.strip() if dep else None,
             "halt_minutes": halt,
             "distance_km": dist,
+            "distance_from_prev": prev_dist,
             "day_number": day,
             "platform": str(row.get("platform")).strip() if row.get("platform") else None
         })

@@ -7,9 +7,10 @@ class Train(Base):
     __tablename__ = "trains"
 
     id = Column(Integer, primary_key=True, index=True)
-    train_number = Column(String(10), unique=True, index=True, nullable=False)  # e.g. "12951", "22954", "93005", "09159"
-    train_name = Column(String(150), nullable=False, index=True)               # e.g. "Mumbai Tejas Rajdhani Express"
-    train_category = Column(String(50), nullable=False, default="Superfast", index=True) # "MEMU", "DEMU", "EMU", "Local", "Superfast", "Express", "Passenger", "Mail Express", "Weekly", "Special"
+    train_number = Column(String(10), unique=True, index=True, nullable=False)  # e.g. "12953", "12951", "22954", "93005", "09159"
+    train_name = Column(String(150), nullable=False, index=True)               # e.g. "August Kranti Tejas Rajdhani Express"
+    short_name = Column(String(50), nullable=True, index=True)                 # e.g. "AK Tejas Raj Ex"
+    train_category = Column(String(50), nullable=False, default="Superfast", index=True) # "Rajdhani Express", "Vande Bharat", "Shatabdi", "MEMU", "DEMU", "Local", "Superfast", "Express", "Passenger", "Mail Express", "Weekly", "Special"
     train_type = Column(String(50), nullable=False, default="Superfast")       # "Rajdhani", "Vande Bharat", "Shatabdi", "Suburban Local", etc.
     source_station_code = Column(String(10), ForeignKey("stations.code"), nullable=False, index=True)
     destination_station_code = Column(String(10), ForeignKey("stations.code"), nullable=False, index=True)
@@ -25,6 +26,8 @@ class Train(Base):
     is_active = Column(Boolean, default=True)
     source_of_data = Column(String(100), default="CRIS / NTES Official Timetable")
     last_verified_date = Column(String(20), nullable=True)
+    aliases = Column(JSON, nullable=True, default=list)                         # ["AK Tejas Raj Ex", "August Kranti", "August Kranti Tejas Rajdhani", "MMCT NZM"]
+    tags = Column(JSON, nullable=True, default=list)                            # ["Rajdhani", "Tejas", "Premium", "Overnight"]
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     source_station = relationship("Station", foreign_keys=[source_station_code])

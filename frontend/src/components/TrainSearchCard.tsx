@@ -21,7 +21,10 @@ export const TrainSearchCard: React.FC<TrainSearchCardProps> = ({
 
   const categories = [
     { id: '', label: 'All Services' },
-    { id: 'Superfast', label: 'Superfast & Rajdhani' },
+    { id: 'Rajdhani', label: 'Rajdhani' },
+    { id: 'Vande Bharat', label: 'Vande Bharat' },
+    { id: 'Shatabdi', label: 'Shatabdi' },
+    { id: 'Superfast', label: 'Superfast' },
     { id: 'Express', label: 'Express' },
     { id: 'MEMU', label: 'MEMU Services' },
     { id: 'DEMU', label: 'DEMU Services' },
@@ -52,9 +55,11 @@ export const TrainSearchCard: React.FC<TrainSearchCardProps> = ({
   };
 
   const quickTrains = [
+    { num: '12953', name: 'August Kranti Tejas Raj', tag: 'Rajdhani' },
     { num: '22961', name: 'Mumbai-ADI Vande Bharat', tag: 'VB' },
     { num: '22954', name: 'Gujarat SF Express', tag: 'SF' },
     { num: '12951', name: 'Mumbai Tejas Rajdhani', tag: 'Rajdhani' },
+    { num: '12002', name: 'Bhopal Shatabdi', tag: 'Shatabdi' },
     { num: '09159', name: 'Bandra-Vapi MEMU', tag: 'MEMU' },
     { num: '93005', name: 'Churchgate-Dahanu Local', tag: 'Local' },
     { num: '09001', name: 'MMCT-NDLS AC Special', tag: 'Special' },

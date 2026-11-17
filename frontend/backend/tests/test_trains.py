@@ -89,5 +89,79 @@ def test_search_by_station_name_resolution(client):
     # Should include 93005 (Churchgate - Dahanu Road Local) or 09159
     assert any(n in ["93005", "09159", "22953", "19015"] for n in train_nums)
 
+def test_train_12953_august_kranti_details_and_stops(client):
+    response = client.get("/api/v1/trains/12953")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["train_number"] == "12953"
+    assert "August Kranti" in data["train_name"]
+    assert data["short_name"] == "AK Tejas Raj Ex"
+    assert data["train_category"] == "Rajdhani Express"
+    assert data["source_station_code"] == "MMCT"
+    assert data["destination_station_code"] == "NZM"
+    assert len(data["stops"]) == 12
+
+    # Verify stops sequence, stations, and distance_from_prev
+    expected_stops = ["MMCT", "BVI", "VAPI", "BL", "ST", "BH", "BRC", "RTM", "KOTA", "SWM", "MTJ", "NZM"]
+    stop_codes = [s["station_code"] for s in data["stops"]]
+    assert stop_codes == expected_stops
+
+    seqs = [s["stop_sequence"] for s in data["stops"]]
+    assert seqs == list(range(1, 13))
+
+    # Verify distance_from_prev calculation
+    first_stop = data["stops"][0]
+    assert first_stop["distance_km"] == 0.0
+    assert first_stop["distance_from_prev"] == 0.0
+
+    second_stop = data["stops"][1]
+    assert second_stop["station_code"] == "BVI"
+    assert second_stop["distance_km"] == 30.0
+    assert second_stop["distance_from_prev"] == 30.0
+
+    last_stop = data["stops"][-1]
+    assert last_stop["station_code"] == "NZM"
+    assert last_stop["distance_km"] == 1377.0
+    assert last_stop["distance_from_prev"] == 134.0
+
+def test_train_12953_aliases_search(client):
+    queries = [
+        "12953",
+        "AK Tejas Raj Ex",
+        "AK Tejas Raj",
+        "August Kranti",
+        "August Kranti Tejas Rajdhani",
+        "August Kranti Rajdhani",
+        "Mumbai Central Nizamuddin Rajdhani",
+        "MMCT NZM",
+        "MMCT to NZM"
+    ]
+    for q in queries:
+        resp = client.get(f"/api/v1/trains?query={q}")
+        assert resp.status_code == 200, f"Query failed: {q}"
+        data = resp.json()
+        assert data["total"] >= 1, f"No results for query '{q}'"
+        train_nums = [t["train_number"] for t in data["items"]]
+        assert "12953" in train_nums, f"Train 12953 not found in results for query '{q}'"
+
+def test_category_rajdhani_search(client):
+    resp = client.get("/api/v1/trains?category=Rajdhani")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] >= 2
+    train_nums = [t["train_number"] for t in data["items"]]
+    assert "12953" in train_nums
+    assert "12951" in train_nums
+
+def test_intermediate_station_search_boisar(client):
+    resp = client.get("/api/v1/trains?query=Boisar")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] >= 1
+    # Train 09159 (Bandra - Vapi MEMU) or 93005 calls at Boisar
+    train_nums = [t["train_number"] for t in data["items"]]
+    assert any(n in ["09159", "09160", "93005", "93006", "93025", "93026"] for n in train_nums)
+
+
 
 

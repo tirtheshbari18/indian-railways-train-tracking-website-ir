@@ -1,6 +1,7 @@
+import re
 from typing import List, Optional, Tuple, Dict, Any
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import or_, and_, func
+from sqlalchemy import or_, and_, func, cast, String
 from fastapi import HTTPException, status
 from backend.app.models.train import Train
 from backend.app.models.stop import Stop
@@ -18,7 +19,7 @@ def resolve_station_codes(db: Session, text: str) -> List[str]:
         return []
 
     codes = set()
-    # Check if exact code
+    # Check if exact code matches
     direct = db.query(Station.code).filter(Station.code.ilike(txt)).first()
     if direct:
         codes.add(direct[0].upper())
@@ -60,40 +61,171 @@ def search_trains(
         joinedload(Train.destination_station)
     )
 
-    # Detect "X to Y" in query if source and destination aren't explicitly passed
-    if query and not source and not destination:
-        clean_q = query.strip()
-        sep = None
-        if " to " in clean_q.lower():
-            sep = " to "
-        elif " - " in clean_q:
-            sep = " - "
-        
-        if sep:
-            parts = clean_q.lower().split(sep)
-            if len(parts) == 2 and parts[0].strip() and parts[1].strip():
-                source = parts[0].strip()
-                destination = parts[1].strip()
-                query = None  # Clear query so we do a pair search
+    clean_q = query.strip() if query else None
 
-    if query:
-        search = f"%{query.strip()}%"
-        # First check if query matches train number or name
-        q = q.filter(
-            or_(
-                Train.train_number.ilike(search),
-                Train.train_name.ilike(search)
-            )
+    # Step 1: Detect Origin-Destination pairs inside a single search query if not explicitly passed
+    if clean_q and not source and not destination:
+        # Check standard separators " to ", " - ", " – ", " -> "
+        pair_match = re.split(r'\s+(?:to|-|–|->)\s+', clean_q, flags=re.IGNORECASE)
+        if len(pair_match) == 2 and pair_match[0].strip() and pair_match[1].strip():
+            src_part = pair_match[0].strip()
+            dst_part = pair_match[1].strip()
+            src_c = resolve_station_codes(db, src_part)
+            dst_c = resolve_station_codes(db, dst_part)
+            if src_c and dst_c:
+                source = src_part
+                destination = dst_part
+                clean_q = None
+
+        # Check two-token space-separated queries (e.g. "MMCT NZM", "BOR DRD", "ADI MMCT")
+        if clean_q:
+            tokens = clean_q.split()
+            if len(tokens) == 2:
+                # Check if this exact phrase is registered as an alias or train name first
+                has_alias = db.query(Train.id).filter(
+                    or_(
+                        Train.train_number.ilike(clean_q),
+                        Train.train_name.ilike(f"%{clean_q}%"),
+                        Train.short_name.ilike(f"%{clean_q}%"),
+                        cast(Train.aliases, String).ilike(f"%{clean_q}%")
+                    )
+                ).first()
+                if not has_alias:
+                    c1 = db.query(Station.code).filter(Station.code.ilike(tokens[0])).first()
+                    c2 = db.query(Station.code).filter(Station.code.ilike(tokens[1])).first()
+                    if c1 and c2:
+                        source = tokens[0]
+                        destination = tokens[1]
+                        clean_q = None
+
+    # Step 2: Query Matching (Train Number, Full Name, Short Name, Aliases, Tags, Category)
+    if clean_q:
+        search_pattern = f"%{clean_q}%"
+        keywords = [k.strip() for k in clean_q.split() if len(k.strip()) >= 2]
+
+        # Multi-keyword condition: all words must match somewhere across the train entity
+        kw_conditions = []
+        if len(keywords) > 1:
+            for kw in keywords:
+                kw_pat = f"%{kw}%"
+                kw_conditions.append(
+                    or_(
+                        Train.train_number.ilike(kw_pat),
+                        Train.train_name.ilike(kw_pat),
+                        Train.short_name.ilike(kw_pat),
+                        cast(Train.aliases, String).ilike(kw_pat),
+                        cast(Train.tags, String).ilike(kw_pat),
+                        Train.train_category.ilike(kw_pat),
+                        Train.train_type.ilike(kw_pat)
+                    )
+                )
+
+        train_match_filter = or_(
+            Train.train_number.ilike(search_pattern),
+            Train.train_name.ilike(search_pattern),
+            Train.short_name.ilike(search_pattern),
+            cast(Train.aliases, String).ilike(search_pattern),
+            cast(Train.tags, String).ilike(search_pattern),
+            Train.train_category.ilike(search_pattern),
+            Train.train_type.ilike(search_pattern),
+            and_(*kw_conditions) if len(kw_conditions) > 1 else False
         )
 
-    # Train Type filter (e.g. Rajdhani, Vande Bharat)
+        # Check if direct train match exists
+        train_matches_count = db.query(Train.id).filter(train_match_filter).count()
+
+        if train_matches_count > 0:
+            q = q.filter(train_match_filter)
+        else:
+            # If no train matches by name/alias/number, check if query matches an intermediate station (e.g. "Boisar", "Vadodara")
+            st_codes = resolve_station_codes(db, clean_q)
+            if st_codes:
+                matching_train_ids = db.query(Stop.train_id).filter(Stop.station_code.in_(st_codes)).all()
+                valid_ids = [t[0] for t in matching_train_ids]
+                q = q.filter(
+                    or_(
+                        Train.source_station_code.in_(st_codes),
+                        Train.destination_station_code.in_(st_codes),
+                        Train.id.in_(valid_ids)
+                    )
+                )
+            else:
+                q = q.filter(train_match_filter)
+
+    # Step 3: Train Type filter
     if train_type:
         q = q.filter(Train.train_type.ilike(f"%{train_type.strip()}%"))
 
-    # Train Category filter (e.g. MEMU, DEMU, EMU, Local, Superfast, Express, Passenger, Mail, Weekly, Special)
+    # Step 4: Category filter (covering all 32 Indian Railways categories)
     if category:
         cat_lower = category.strip().lower()
-        if cat_lower in ["local", "emu"]:
+        if cat_lower == "rajdhani":
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Rajdhani%"),
+                    Train.train_category.ilike("%Rajdhani%"),
+                    cast(Train.tags, String).ilike("%Rajdhani%")
+                )
+            )
+        elif cat_lower in ["vande bharat", "vb"]:
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Vande Bharat%"),
+                    Train.train_category.ilike("%Vande Bharat%"),
+                    cast(Train.tags, String).ilike("%Vande Bharat%")
+                )
+            )
+        elif cat_lower == "shatabdi":
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Shatabdi%"),
+                    Train.train_category.ilike("%Shatabdi%")
+                )
+            )
+        elif cat_lower == "duronto":
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Duronto%"),
+                    Train.train_category.ilike("%Duronto%")
+                )
+            )
+        elif cat_lower == "tejas":
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Tejas%"),
+                    Train.train_category.ilike("%Tejas%"),
+                    cast(Train.tags, String).ilike("%Tejas%")
+                )
+            )
+        elif cat_lower in ["garib rath", "garibrath"]:
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Garib Rath%"),
+                    Train.train_category.ilike("%Garib Rath%")
+                )
+            )
+        elif cat_lower in ["sampark kranti", "sampark"]:
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Sampark Kranti%"),
+                    Train.train_category.ilike("%Sampark Kranti%")
+                )
+            )
+        elif cat_lower == "humsafar":
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Humsafar%"),
+                    Train.train_category.ilike("%Humsafar%")
+                )
+            )
+        elif cat_lower in ["amrit bharat", "amrit"]:
+            q = q.filter(
+                or_(
+                    Train.train_type.ilike("%Amrit Bharat%"),
+                    Train.train_category.ilike("%Amrit Bharat%")
+                )
+            )
+        elif cat_lower in ["local", "emu", "mumbai local"]:
             q = q.filter(
                 or_(
                     Train.train_category.ilike("%Local%"),
@@ -109,7 +241,7 @@ def search_trains(
                     Train.train_type.ilike(f"%{category.strip()}%")
                 )
             )
-        elif cat_lower in ["special", "festival special", "holiday special"]:
+        elif cat_lower in ["special", "festival special", "summer special", "winter special", "holiday special"]:
             q = q.filter(
                 or_(
                     Train.train_category.ilike("%Special%"),
@@ -117,7 +249,7 @@ def search_trains(
                     Train.train_name.ilike("%Special%")
                 )
             )
-        elif cat_lower == "weekly":
+        elif cat_lower in ["weekly", "biweekly", "triweekly"]:
             q = q.filter(
                 or_(
                     Train.train_category.ilike("%Weekly%"),
@@ -125,18 +257,51 @@ def search_trains(
                     Train.running_days.notin_(["1111111", "Daily"])
                 )
             )
+        elif cat_lower == "superfast":
+            q = q.filter(
+                or_(
+                    Train.train_category.ilike("%Superfast%"),
+                    Train.train_type.ilike("%Superfast%"),
+                    Train.train_type.ilike("%Rajdhani%"),
+                    Train.train_type.ilike("%Vande Bharat%"),
+                    Train.train_type.ilike("%Shatabdi%"),
+                    Train.train_type.ilike("%Tejas%")
+                )
+            )
+        elif cat_lower == "express":
+            q = q.filter(
+                or_(
+                    Train.train_category.ilike("%Express%"),
+                    Train.train_type.ilike("%Express%")
+                )
+            )
+        elif cat_lower == "passenger":
+            q = q.filter(
+                or_(
+                    Train.train_category.ilike("%Passenger%"),
+                    Train.train_type.ilike("%Passenger%")
+                )
+            )
+        elif cat_lower == "mail":
+            q = q.filter(
+                or_(
+                    Train.train_category.ilike("%Mail%"),
+                    Train.train_type.ilike("%Mail%")
+                )
+            )
         else:
             q = q.filter(
                 or_(
                     Train.train_category.ilike(f"%{category.strip()}%"),
-                    Train.train_type.ilike(f"%{category.strip()}%")
+                    Train.train_type.ilike(f"%{category.strip()}%"),
+                    cast(Train.tags, String).ilike(f"%{category.strip()}%")
                 )
             )
 
     if is_special is not None:
         q = q.filter(Train.is_special == is_special)
 
-    # Origin & Destination search with station name-to-code resolution
+    # Step 5: Origin & Destination search with station name-to-code resolution
     if source and destination:
         src_codes = resolve_station_codes(db, source)
         dst_codes = resolve_station_codes(db, destination)
@@ -208,7 +373,8 @@ def search_trains(
 
 def get_train_by_number(db: Session, train_number: str) -> Optional[Train]:
     num = train_number.strip().upper()
-    return (
+    # Check exact match first
+    train = (
         db.query(Train)
         .options(
             joinedload(Train.source_station),
@@ -218,6 +384,27 @@ def get_train_by_number(db: Session, train_number: str) -> Optional[Train]:
         .filter(Train.train_number == num)
         .first()
     )
+    if train:
+        return train
+
+    # If not found directly, check if train_number matches an alias or short name
+    train_by_alias = (
+        db.query(Train)
+        .options(
+            joinedload(Train.source_station),
+            joinedload(Train.destination_station),
+            joinedload(Train.stops).joinedload(Stop.station)
+        )
+        .filter(
+            or_(
+                Train.short_name.ilike(num),
+                cast(Train.aliases, String).ilike(f'%"{num}"%'),
+                cast(Train.aliases, String).ilike(f"%{num}%")
+            )
+        )
+        .first()
+    )
+    return train_by_alias
 
 def get_train_by_id(db: Session, train_id: int) -> Optional[Train]:
     return (
@@ -251,6 +438,7 @@ def create_train(db: Session, data: TrainCreate) -> Train:
     train = Train(
         train_number=num,
         train_name=data.train_name.strip(),
+        short_name=data.short_name.strip() if data.short_name else None,
         train_type=data.train_type,
         train_category=data.train_category or data.train_type or "Express",
         source_station_code=src.code,
@@ -266,7 +454,9 @@ def create_train(db: Session, data: TrainCreate) -> Train:
         is_special=data.is_special or False,
         is_active=data.is_active if data.is_active is not None else True,
         source_of_data=data.source_of_data or "CRIS_OFFICIAL",
-        last_verified_date=data.last_verified_date
+        last_verified_date=data.last_verified_date,
+        aliases=data.aliases or [],
+        tags=data.tags or []
     )
     db.add(train)
     db.flush()
@@ -281,6 +471,7 @@ def create_train(db: Session, data: TrainCreate) -> Train:
                 departure_time=s.departure_time,
                 halt_minutes=s.halt_minutes,
                 distance_km=s.distance_km,
+                distance_from_prev=s.distance_from_prev,
                 day_number=s.day_number,
                 platform=s.platform
             )

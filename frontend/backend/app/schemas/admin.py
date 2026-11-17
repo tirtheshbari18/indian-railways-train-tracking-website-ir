@@ -43,6 +43,8 @@ class AdminCompletenessStats(BaseModel):
     alerts_count: int
     users_count: int
     audit_logs_count: int
+    total_route_records: int
+    total_route_stops: int
     # Category counts
     memu_count: int
     demu_count: int
@@ -52,6 +54,13 @@ class AdminCompletenessStats(BaseModel):
     superfast_count: int
     passenger_count: int
     mail_count: int
+    rajdhani_count: int
+    shatabdi_count: int = 0
+    vande_bharat_count: int = 0
+    duronto_count: int = 0
+    garib_rath_count: int = 0
+    tejas_count: int = 0
+    humsafar_count: int = 0
     weekly_count: int
     special_count: int
     # Breakdown dictionaries

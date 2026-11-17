@@ -53,6 +53,13 @@ def get_admin_stats(db: Session = Depends(get_db), admin: User = Depends(require
     express_count = 0
     passenger_count = 0
     mail_count = 0
+    rajdhani_count = 0
+    shatabdi_count = 0
+    vande_bharat_count = 0
+    duronto_count = 0
+    garib_rath_count = 0
+    tejas_count = 0
+    humsafar_count = 0
     weekly_count = 0
     special_count = 0
     trains_by_cat: Dict[str, int] = {}
@@ -62,7 +69,32 @@ def get_admin_stats(db: Session = Depends(get_db), admin: User = Depends(require
         trains_by_cat[cat] = trains_by_cat.get(cat, 0) + 1
 
         cat_upper = cat.upper()
-        if "MEMU" in cat_upper:
+        name_upper = (t.train_name or "").upper()
+        type_upper = (t.train_type or "").upper()
+        tags_str = str(t.tags or []).upper()
+
+        if "RAJDHANI" in cat_upper or "RAJDHANI" in name_upper or "RAJDHANI" in type_upper or "RAJDHANI" in tags_str:
+            rajdhani_count += 1
+            superfast_count += 1
+        elif "VANDE BHARAT" in cat_upper or "VANDE BHARAT" in name_upper or "VANDE BHARAT" in type_upper:
+            vande_bharat_count += 1
+            superfast_count += 1
+        elif "SHATABDI" in cat_upper or "SHATABDI" in name_upper or "SHATABDI" in type_upper:
+            shatabdi_count += 1
+            superfast_count += 1
+        elif "DURONTO" in cat_upper or "DURONTO" in name_upper or "DURONTO" in type_upper:
+            duronto_count += 1
+            superfast_count += 1
+        elif "GARIB RATH" in cat_upper or "GARIB RATH" in name_upper:
+            garib_rath_count += 1
+            superfast_count += 1
+        elif "HUMSAFAR" in cat_upper or "HUMSAFAR" in name_upper:
+            humsafar_count += 1
+            superfast_count += 1
+        elif "TEJAS" in cat_upper or "TEJAS" in name_upper:
+            tejas_count += 1
+            superfast_count += 1
+        elif "MEMU" in cat_upper:
             memu_count += 1
         elif "DEMU" in cat_upper:
             demu_count += 1
@@ -71,16 +103,16 @@ def get_admin_stats(db: Session = Depends(get_db), admin: User = Depends(require
             local_count += 1
         elif "LOCAL" in cat_upper or "SUBURBAN" in cat_upper:
             local_count += 1
-        elif "SUPERFAST" in cat_upper or "RAJDHANI" in cat_upper or "TEJAS" in cat_upper or "VANDE BHARAT" in cat_upper or "SHATABDI" in cat_upper:
+        elif "SUPERFAST" in cat_upper:
             superfast_count += 1
-        elif "MAIL" in cat_upper:
+        elif "MAIL" in cat_upper or "MAIL" in name_upper:
             mail_count += 1
         elif "PASSENGER" in cat_upper or "ORDINARY" in cat_upper:
             passenger_count += 1
         else:
             express_count += 1
 
-        if t.is_special or "SPECIAL" in cat_upper or "SPECIAL" in (t.train_name or "").upper():
+        if t.is_special or "SPECIAL" in cat_upper or "SPECIAL" in name_upper:
             special_count += 1
 
         if "WEEKLY" in cat_upper or (t.running_days and t.running_days != "1111111" and "Daily" not in t.running_days):
@@ -104,6 +136,8 @@ def get_admin_stats(db: Session = Depends(get_db), admin: User = Depends(require
         alerts_count=alerts_count,
         users_count=users_count,
         audit_logs_count=audit_logs_count,
+        total_route_records=trains_count,
+        total_route_stops=stops_count,
         memu_count=memu_count,
         demu_count=demu_count,
         emu_count=emu_count,
@@ -112,6 +146,13 @@ def get_admin_stats(db: Session = Depends(get_db), admin: User = Depends(require
         superfast_count=superfast_count,
         passenger_count=passenger_count,
         mail_count=mail_count,
+        rajdhani_count=rajdhani_count,
+        shatabdi_count=shatabdi_count,
+        vande_bharat_count=vande_bharat_count,
+        duronto_count=duronto_count,
+        garib_rath_count=garib_rath_count,
+        tejas_count=tejas_count,
+        humsafar_count=humsafar_count,
         weekly_count=weekly_count,
         special_count=special_count,
         trains_by_category=trains_by_cat,
