@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Train as TrainIcon, MapPin, Clock, Bookmark, ChevronRight, Filter, ArrowLeft } from 'lucide-react';
+import { Train as TrainIcon, MapPin, Clock, Bookmark, ChevronRight, Filter, ArrowLeft, ShieldCheck, Sparkles, Calendar } from 'lucide-react';
 import { Train } from '../types';
 import { StatusBadge } from '../components/StatusBadge';
 import { useSavedTrains } from '../context/SavedTrainsContext';
@@ -7,7 +7,7 @@ import { useSavedTrains } from '../context/SavedTrainsContext';
 interface SearchResultsPageProps {
   trains: Train[];
   total: number;
-  searchParams: { query?: string; source?: string; destination?: string };
+  searchParams: { query?: string; source?: string; destination?: string; category?: string };
   onSelectTrain: (trainNumber: string) => void;
   onBack: () => void;
 }
@@ -20,13 +20,17 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
   onBack
 }) => {
   const { isSaved, toggleSave } = useSavedTrains();
-  const [selectedType, setSelectedType] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string>(searchParams.category || 'ALL');
 
-  const trainTypes = ['ALL', 'Rajdhani', 'Vande Bharat', 'Shatabdi', 'Superfast'];
+  const filterCategories = ['ALL', 'Superfast', 'Express', 'MEMU', 'DEMU', 'Local', 'Passenger', 'Special'];
 
   const filteredTrains = trains.filter((t) => {
-    if (selectedType === 'ALL') return true;
-    return t.train_type.toLowerCase().includes(selectedType.toLowerCase());
+    if (selectedCategory === 'ALL') return true;
+    const cat = (t.train_category || t.train_type || '').toLowerCase();
+    const target = selectedCategory.toLowerCase();
+    if (target === 'special') return t.is_special || cat.includes('special');
+    if (target === 'local') return cat.includes('local') || cat.includes('emu');
+    return cat.includes(target);
   });
 
   const formatDays = (mask: string) => {
@@ -73,29 +77,29 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
               ) : searchParams.query ? (
                 <>Query matching: &ldquo;<strong className="text-slate-200">{searchParams.query}</strong>&rdquo;</>
               ) : (
-                'All Available Express Trains'
-              )} ({total} found)
+                'All Verified Trains'
+              )} ({total} found in Indian Railways database)
             </p>
           </div>
         </div>
 
-        {/* Filter by train type */}
+        {/* Filter by train category */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <span className="text-xs text-slate-400 flex items-center gap-1 mr-1">
             <Filter className="w-3.5 h-3.5 text-slate-500" />
-            Type:
+            Category:
           </span>
-          {trainTypes.map((type) => (
+          {filterCategories.map((cat) => (
             <button
-              key={type}
-              onClick={() => setSelectedType(type)}
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
               className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
-                selectedType === type
-                  ? 'bg-amber-500 text-slate-950 shadow-sm'
+                selectedCategory === cat
+                  ? 'bg-amber-500 text-slate-950 shadow-sm font-bold'
                   : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
               }`}
             >
-              {type}
+              {cat}
             </button>
           ))}
         </div>
@@ -107,7 +111,7 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
           <TrainIcon className="w-10 h-10 text-slate-600 mx-auto" />
           <h3 className="text-base font-bold text-slate-300">No matching trains found</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto">
-            Try searching for a major terminal code (e.g. MMCT, ADI, NDLS, HWH) or train number (e.g. 22961, 22954, 12951, 22436).
+            Try searching for a station name (e.g. Boisar, Dahanu Road, Mumbai Central, Vadodara) or service number (e.g. 22961, 93005, 09159, 12951).
           </p>
           <button
             onClick={onBack}
@@ -139,7 +143,17 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
                       <h3 className="text-base font-bold text-slate-100 group-hover:text-amber-400 transition-colors">
                         {train.train_name}
                       </h3>
-                      <StatusBadge type="trainType" value={train.train_type} />
+                      <StatusBadge type="trainType" value={train.train_category || train.train_type} />
+                      {train.is_special && (
+                        <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-amber-400" />
+                          Festival Special
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/90 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded font-mono">
+                        <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                        CRIS Timetable
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-4 text-xs text-slate-300 flex-wrap">
@@ -151,39 +165,38 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
                           {train.destination_station?.name || train.destination_station_code} ({train.destination_station_code})
                         </span>
                       </div>
-                      <span>•</span>
-                      <span>{train.total_distance_km} km</span>
-                      {train.duration_minutes > 0 && (
-                        <>
-                          <span>•</span>
-                          <span>{hours}h {mins}m</span>
-                        </>
+
+                      <div className="flex items-center gap-1 text-slate-400">
+                        <Clock className="w-3.5 h-3.5 text-slate-500" />
+                        <span>{hours}h {mins}m ({train.total_distance_km} km)</span>
+                      </div>
+
+                      {train.validity_start && train.validity_end && (
+                        <div className="flex items-center gap-1 text-[11px] text-amber-300/80">
+                          <Calendar className="w-3 h-3 text-amber-400" />
+                          <span>Valid: {train.validity_start} to {train.validity_end}</span>
+                        </div>
                       )}
                     </div>
 
-                    {/* Classes & Pantry */}
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
-                      <span className="text-[11px] text-slate-500 font-mono">Classes:</span>
-                      <div className="flex items-center gap-1 font-mono text-[11px]">
-                        {train.classes?.map((c) => (
-                          <span key={c} className="px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">
-                            {c}
+                    {/* Classes */}
+                    {train.classes && train.classes.length > 0 && (
+                      <div className="flex items-center gap-1 flex-wrap pt-1">
+                        <span className="text-[11px] text-slate-500 mr-1">Classes:</span>
+                        {train.classes.map((cls) => (
+                          <span
+                            key={cls}
+                            className="px-2 py-0.5 rounded bg-slate-800 text-[10px] font-mono font-bold text-slate-300 border border-slate-700/60"
+                          >
+                            {cls}
                           </span>
                         ))}
                       </div>
-                      {train.pantry_car && (
-                        <span className="text-[11px] text-emerald-400 font-medium">✓ Pantry Car</span>
-                      )}
-                    </div>
+                    )}
                   </div>
 
-                  {/* Right: Days & Actions */}
-                  <div className="flex items-center justify-between md:justify-end gap-6 pt-3 md:pt-0 border-t md:border-t-0 border-slate-800">
-                    <div className="text-right">
-                      <div className="text-[10px] uppercase font-mono text-slate-500 mb-1">Runs On</div>
-                      {formatDays(train.running_days)}
-                    </div>
-
+                  {/* Right: Operating Days & Save */}
+                  <div className="flex md:flex-col items-center md:items-end justify-between gap-3 border-t md:border-t-0 pt-3 md:pt-0 border-slate-800">
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
@@ -191,27 +204,25 @@ export const SearchResultsPage: React.FC<SearchResultsPageProps> = ({
                           e.stopPropagation();
                           toggleSave(train);
                         }}
-                        title={saved ? 'Remove from Saved' : 'Save Train'}
                         className={`p-2 rounded-xl border transition-colors ${
                           saved
-                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
-                            : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-white'
+                            ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
+                            : 'bg-slate-800 hover:bg-slate-700 border-slate-700 text-slate-400 hover:text-white'
                         }`}
+                        title={saved ? 'Remove from Saved' : 'Save Train'}
                       >
-                        <Bookmark className="w-4 h-4 fill-current" />
+                        <Bookmark className={`w-4 h-4 ${saved ? 'fill-amber-400' : ''}`} />
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onSelectTrain(train.train_number);
-                        }}
-                        className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center gap-1 transition-all shadow-sm"
-                      >
-                        <span>Live Telemetry</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </button>
+                      <div className="hidden sm:flex items-center gap-1 text-xs text-amber-400 font-bold group-hover:translate-x-1 transition-transform">
+                        <span>View Route & Live Telemetry</span>
+                        <ChevronRight className="w-4 h-4" />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-slate-500 font-semibold uppercase">Runs:</span>
+                      {formatDays(train.running_days)}
                     </div>
                   </div>
                 </div>

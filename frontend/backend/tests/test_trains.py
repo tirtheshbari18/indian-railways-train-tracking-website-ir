@@ -71,4 +71,23 @@ def test_tejas_12951_vadodara_schedule(client):
     assert brc_stops[0]["departure_time"] == "21:27"
     assert brc_stops[0]["halt_minutes"] == 13
 
+def test_search_by_category_memu(client):
+    response = client.get("/api/v1/trains?category=MEMU")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] >= 1
+    train_nums = [t["train_number"] for t in data["items"]]
+    assert "09159" in train_nums
+
+def test_search_by_station_name_resolution(client):
+    # Searching human station name "Boisar" to "Dahanu Road"
+    response = client.get("/api/v1/trains?source=Boisar&destination=Dahanu Road")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total"] >= 1
+    train_nums = [t["train_number"] for t in data["items"]]
+    # Should include 93005 (Churchgate - Dahanu Road Local) or 09159
+    assert any(n in ["93005", "09159", "22953", "19015"] for n in train_nums)
+
+
 

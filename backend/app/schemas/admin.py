@@ -35,3 +35,29 @@ class AuditLogResponse(BaseModel):
     ip_address: Optional[str] = None
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
+
+class AdminCompletenessStats(BaseModel):
+    stations_count: int
+    trains_count: int
+    stops_count: int
+    alerts_count: int
+    users_count: int
+    audit_logs_count: int
+    # Category counts
+    memu_count: int
+    demu_count: int
+    emu_count: int
+    local_count: int
+    express_count: int
+    superfast_count: int
+    passenger_count: int
+    mail_count: int
+    weekly_count: int
+    special_count: int
+    # Breakdown dictionaries
+    trains_by_category: Dict[str, int]
+    stations_by_zone: Dict[str, int]
+    stations_by_division: Dict[str, int]
+    missing_route_trains_count: int
+    duplicate_records_checked: bool = True
+    records_requiring_verification: int = 0

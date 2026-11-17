@@ -20,13 +20,13 @@ export const AppContent: React.FC = () => {
   const [stations, setStations] = useState<Station[]>([]);
   const [alerts, setAlerts] = useState<ServiceAlert[]>([]);
   const [searchResults, setSearchResults] = useState<{ items: Train[]; total: number }>({ items: [], total: 0 });
-  const [searchParams, setSearchParams] = useState<{ query?: string; source?: string; destination?: string }>({});
+  const [searchParams, setSearchParams] = useState<{ query?: string; source?: string; destination?: string; category?: string }>({});
   const [selectedTrainNumber, setSelectedTrainNumber] = useState<string>('12951');
   const [selectedStationCode, setSelectedStationCode] = useState<string>('NDLS');
 
   useEffect(() => {
     // Initial fetch of stations and alerts
-    api.getStations(undefined, 100)
+    api.getStations(undefined, 200)
       .then((res) => setStations(res))
       .catch((err) => console.error('Failed to load stations', err));
 
@@ -35,7 +35,7 @@ export const AppContent: React.FC = () => {
       .catch((err) => console.error('Failed to load alerts', err));
   }, []);
 
-  const handleSearchTrains = async (params: { query?: string; source?: string; destination?: string }) => {
+  const handleSearchTrains = async (params: { query?: string; source?: string; destination?: string; category?: string }) => {
     setSearchParams(params);
     try {
       const res = await api.searchTrains({ ...params, limit: 50 });

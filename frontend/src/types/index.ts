@@ -1,12 +1,17 @@
 export interface Station {
   code: string;
   name: string;
+  state?: string;
+  district?: string;
   division?: string;
   zone?: string;
-  state?: string;
   latitude: number;
   longitude: number;
+  category?: 'Terminal' | 'Junction' | 'Suburban' | 'Regular' | 'Halt' | string;
   platforms_count?: number;
+  facilities?: string[] | null;
+  operational_status?: string;
+  total_trains_count?: number;
   created_at?: string;
 }
 
@@ -28,6 +33,7 @@ export interface Train {
   train_number: string;
   train_name: string;
   train_type: string;
+  train_category?: string;
   source_station_code: string;
   destination_station_code: string;
   running_days: string;
@@ -36,6 +42,12 @@ export interface Train {
   classes?: string[];
   pantry_car: boolean;
   return_train_number?: string | null;
+  validity_start?: string | null;
+  validity_end?: string | null;
+  is_special?: boolean;
+  is_active?: boolean;
+  source_of_data?: string;
+  last_verified_date?: string | null;
   source_station?: Station;
   destination_station?: Station;
   stops?: Stop[];
@@ -90,6 +102,7 @@ export interface StationLiveBoardItem {
   train_number: string;
   train_name: string;
   train_type: string;
+  train_category?: string;
   source_station_code: string;
   destination_station_code: string;
   scheduled_arrival?: string | null;
@@ -147,6 +160,22 @@ export interface AdminStats {
   alerts_count: number;
   users_count: number;
   audit_logs_count: number;
+  memu_count?: number;
+  demu_count?: number;
+  emu_count?: number;
+  local_count?: number;
+  express_count?: number;
+  superfast_count?: number;
+  passenger_count?: number;
+  mail_count?: number;
+  weekly_count?: number;
+  special_count?: number;
+  trains_by_category?: Record<string, number>;
+  stations_by_zone?: Record<string, number>;
+  stations_by_division?: Record<string, number>;
+  missing_route_trains_count?: number;
+  duplicate_records_checked?: boolean;
+  records_requiring_verification?: number;
 }
 
 export interface ImportValidationResult {

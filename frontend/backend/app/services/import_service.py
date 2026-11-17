@@ -48,21 +48,25 @@ def validate_stations_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[
             errors.append(ValidationErrorDetail(row_index=idx, field="name", message="Station name is required.", raw_data=row))
             continue
 
-        try:
-            lat = float(lat_raw)
-            if not (-90.0 <= lat <= 90.0):
-                raise ValueError()
-        except Exception:
-            errors.append(ValidationErrorDetail(row_index=idx, field="latitude", message="Latitude must be a valid float between -90 and 90.", raw_data=row))
-            continue
+        lat = 0.0
+        if lat_raw is not None and str(lat_raw).strip() != "":
+            try:
+                lat = float(lat_raw)
+                if not (-90.0 <= lat <= 90.0):
+                    raise ValueError()
+            except Exception:
+                errors.append(ValidationErrorDetail(row_index=idx, field="latitude", message="Latitude must be a valid float between -90 and 90.", raw_data=row))
+                continue
 
-        try:
-            lng = float(lng_raw)
-            if not (-180.0 <= lng <= 180.0):
-                raise ValueError()
-        except Exception:
-            errors.append(ValidationErrorDetail(row_index=idx, field="longitude", message="Longitude must be a valid float between -180 and 180.", raw_data=row))
-            continue
+        lng = 0.0
+        if lng_raw is not None and str(lng_raw).strip() != "":
+            try:
+                lng = float(lng_raw)
+                if not (-180.0 <= lng <= 180.0):
+                    raise ValueError()
+            except Exception:
+                errors.append(ValidationErrorDetail(row_index=idx, field="longitude", message="Longitude must be a valid float between -180 and 180.", raw_data=row))
+                continue
 
         platforms = 1
         if row.get("platforms_count"):
@@ -71,14 +75,25 @@ def validate_stations_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[
             except Exception:
                 platforms = 1
 
+        raw_fac = row.get("facilities")
+        facilities = None
+        if isinstance(raw_fac, list):
+            facilities = raw_fac
+        elif isinstance(raw_fac, str) and raw_fac.strip():
+            facilities = [f.strip() for f in raw_fac.split(",") if f.strip()]
+
         valid_records.append({
             "code": code,
             "name": name,
+            "district": row.get("district"),
             "division": row.get("division"),
             "zone": row.get("zone"),
             "state": row.get("state"),
             "latitude": lat,
             "longitude": lng,
+            "category": row.get("category") or "Regular",
+            "facilities": facilities,
+            "operational_status": row.get("operational_status") or "Operational",
             "platforms_count": platforms
         })
 
@@ -142,10 +157,14 @@ def validate_trains_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[Li
         if str(row.get("pantry_car", "")).lower() in ["false", "0", "no"]:
             pantry = False
 
+        is_spec = str(row.get("is_special", "")).lower() in ["true", "1", "yes"]
+        category = row.get("train_category") or row.get("train_type") or "Superfast Express"
+
         valid_records.append({
             "train_number": train_num,
             "train_name": train_name,
             "train_type": row.get("train_type") or "Superfast",
+            "train_category": category,
             "source_station_code": src_code,
             "destination_station_code": dst_code,
             "running_days": str(row.get("running_days") or "1111111"),
@@ -153,7 +172,12 @@ def validate_trains_data(db: Session, records: List[Dict[str, Any]]) -> Tuple[Li
             "duration_minutes": dur,
             "classes": classes,
             "pantry_car": pantry,
-            "return_train_number": row.get("return_train_number")
+            "return_train_number": row.get("return_train_number"),
+            "validity_start": row.get("validity_start"),
+            "validity_end": row.get("validity_end"),
+            "is_special": is_spec,
+            "is_active": str(row.get("is_active", "true")).lower() not in ["false", "0", "no"],
+            "source_of_data": row.get("source_of_data") or "CRIS_OFFICIAL"
         })
 
     return valid_records, errors
@@ -312,7 +336,6 @@ def execute_import_data(
             return ImportResult(success=False, imported_count=0, updated_count=0, errors_count=len(errors), message="No valid timetable rows to import.")
 
         for item in valid_records:
-            # Delete train_number before feeding to model Stop
             t_id = item["train_id"]
             seq = item["stop_sequence"]
             existing_stop = db.query(Stop).filter(Stop.train_id == t_id, Stop.stop_sequence == seq).first()

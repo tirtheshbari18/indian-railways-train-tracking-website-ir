@@ -61,6 +61,7 @@ export const api = {
     destination?: string;
     station?: string;
     train_type?: string;
+    category?: string;
     day?: string;
     page?: number;
     limit?: number;
@@ -71,6 +72,7 @@ export const api = {
     if (params.destination) query.append('destination', params.destination);
     if (params.station) query.append('station', params.station);
     if (params.train_type) query.append('train_type', params.train_type);
+    if (params.category) query.append('category', params.category);
     if (params.day) query.append('day', params.day);
     if (params.page) query.append('page', params.page.toString());
     if (params.limit) query.append('limit', params.limit.toString());

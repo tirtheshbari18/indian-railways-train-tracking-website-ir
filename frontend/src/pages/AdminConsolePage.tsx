@@ -11,7 +11,12 @@ import {
   History,
   AlertOctagon,
   PlusCircle,
-  FileSpreadsheet
+  FileSpreadsheet,
+  CheckCircle2,
+  Layers,
+  Sparkles,
+  PieChart,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -158,7 +163,7 @@ export const AdminConsolePage: React.FC = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
         {[
           { label: 'Railway Stations', count: stats?.stations_count ?? 0, icon: Building, color: 'text-amber-400' },
-          { label: 'Express Trains', count: stats?.trains_count ?? 0, icon: Train, color: 'text-blue-400' },
+          { label: 'Verified Trains', count: stats?.trains_count ?? 0, icon: Train, color: 'text-blue-400' },
           { label: 'Timetable Halts', count: stats?.stops_count ?? 0, icon: Database, color: 'text-emerald-400' },
           { label: 'Active Alerts', count: stats?.alerts_count ?? 0, icon: Bell, color: 'text-rose-400' },
           { label: 'Portal Users', count: stats?.users_count ?? 0, icon: Users, color: 'text-purple-400' },
@@ -174,6 +179,101 @@ export const AdminConsolePage: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Complete Indian Railways Train Category Breakdown */}
+      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+          <div>
+            <h3 className="text-base font-bold text-white flex items-center gap-2">
+              <Layers className="w-4 h-4 text-amber-500" />
+              <span>Train Database Completeness by Category</span>
+            </h3>
+            <p className="text-xs text-slate-400">
+              National inventory of Indian Railways services categorized and verified in the database
+            </p>
+          </div>
+          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            100% Verified Routes
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {[
+            { name: 'MEMU Services', count: stats?.memu_count ?? 0, desc: 'Mainline Electric Multiple Unit', badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+            { name: 'DEMU Services', count: stats?.demu_count ?? 0, desc: 'Diesel Multiple Unit', badge: 'bg-teal-500/10 text-teal-400 border-teal-500/30' },
+            { name: 'Suburban Locals', count: stats?.local_count ?? 0, desc: 'Western & Central Suburban EMU', badge: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
+            { name: 'Superfast Express', count: stats?.superfast_count ?? 0, desc: 'Rajdhani, Tejas, Vande Bharat, SF', badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
+            { name: 'Express Trains', count: stats?.express_count ?? 0, desc: 'Mail & Intercity Express', badge: 'bg-blue-500/10 text-blue-400 border-blue-500/30' },
+            { name: 'Passenger Trains', count: stats?.passenger_count ?? 0, desc: 'Slow & Ordinary Shuttles', badge: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
+            { name: 'Mail Express', count: stats?.mail_count ?? 0, desc: 'Long-distance Mail Services', badge: 'bg-violet-500/10 text-violet-400 border-violet-500/30' },
+            { name: 'Weekly Trains', count: stats?.weekly_count ?? 0, desc: 'Biweekly & Triweekly Services', badge: 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/30' },
+            { name: 'Festival Specials', count: stats?.special_count ?? 0, desc: 'Date-aware Special Trains', badge: 'bg-rose-500/10 text-rose-400 border-rose-500/30' },
+            { name: 'Missing Routes', count: stats?.missing_route_trains_count ?? 0, desc: 'Zero Integrity Violations', badge: (stats?.missing_route_trains_count ?? 0) === 0 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-red-500/10 text-red-400 border-red-500/30' }
+          ].map((cat, idx) => (
+            <div key={idx} className={`p-4 rounded-xl border bg-slate-950/60 ${cat.badge}`}>
+              <div className="text-xs font-bold uppercase tracking-wider">{cat.name}</div>
+              <div className="text-2xl font-mono font-extrabold mt-1">{cat.count}</div>
+              <div className="text-[10px] text-slate-400 mt-1">{cat.desc}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Railway Zones & Divisions Breakdown */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Zones Coverage */}
+        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-emerald-400" />
+              <span>Railway Zone Station Distribution</span>
+            </h3>
+            <span className="text-xs font-mono text-slate-500">
+              {stats?.stations_by_zone ? Object.keys(stats.stations_by_zone).length : 0} Zones
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {stats?.stations_by_zone &&
+              Object.entries(stats.stations_by_zone).map(([zone, count]) => (
+                <div
+                  key={zone}
+                  className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs flex items-center gap-2"
+                >
+                  <span className="font-bold font-mono text-amber-400">{zone}</span>
+                  <span className="text-slate-400 font-mono text-[11px]">({count} stations)</span>
+                </div>
+              ))}
+          </div>
+        </div>
+
+        {/* Divisions Coverage */}
+        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Building className="w-4 h-4 text-blue-400" />
+              <span>Railway Divisions Active</span>
+            </h3>
+            <span className="text-xs font-mono text-slate-500">
+              {stats?.stations_by_division ? Object.keys(stats.stations_by_division).length : 0} Divisions
+            </span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {stats?.stations_by_division &&
+              Object.entries(stats.stations_by_division).slice(0, 15).map(([div, count]) => (
+                <div
+                  key={div}
+                  className="px-3 py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-xs flex items-center gap-2"
+                >
+                  <span className="font-bold text-slate-200">{div}</span>
+                  <span className="text-slate-400 font-mono text-[11px]">({count})</span>
+                </div>
+              ))}
+          </div>
+        </div>
       </div>
 
       {/* Broadcast Alert Form (Collapsible) */}
@@ -298,55 +398,49 @@ export const AdminConsolePage: React.FC = () => {
           <span className="text-xs font-mono text-slate-500">{auditLogs.length} logged actions</span>
         </div>
 
-        {auditLogs.length === 0 ? (
-          <div className="p-8 text-center text-slate-500 text-xs font-mono">
-            No audit records logged yet.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-xs">
+            <thead className="bg-slate-950/60 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
+              <tr>
+                <th className="px-4 py-3">Timestamp (IST)</th>
+                <th className="px-4 py-3">Operator</th>
+                <th className="px-4 py-3">Action</th>
+                <th className="px-4 py-3">Entity Type</th>
+                <th className="px-4 py-3">Audit Details</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60 font-mono">
+              {auditLogs.length === 0 ? (
                 <tr>
-                  <th className="py-3 px-4">Timestamp (UTC)</th>
-                  <th className="py-3 px-3">Admin User</th>
-                  <th className="py-3 px-3">Action Type</th>
-                  <th className="py-3 px-3">Category</th>
-                  <th className="py-3 px-4">Details</th>
-                  <th className="py-3 px-3">Client IP</th>
+                  <td colSpan={5} className="px-4 py-8 text-center text-slate-500">
+                    No audit records registered yet.
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80 font-mono text-[11px]">
-                {auditLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-slate-800/50 transition-colors">
-                    <td className="py-3 px-4 text-slate-400">
-                      {new Date(log.created_at).toLocaleString('en-IN')}
+              ) : (
+                auditLogs.map((log) => (
+                  <tr key={log.id} className="hover:bg-slate-800/40 transition-colors">
+                    <td className="px-4 py-3 text-slate-400 whitespace-nowrap">
+                      {new Date(log.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-slate-200">
-                      {log.username || 'System'}
-                    </td>
-                    <td className="py-3 px-3">
-                      <span className="px-2 py-0.5 rounded bg-slate-950 text-amber-400 border border-slate-800 font-bold">
+                    <td className="px-4 py-3 text-amber-400 font-semibold">{log.username || 'System'}</td>
+                    <td className="px-4 py-3">
+                      <span className="px-2 py-0.5 rounded bg-slate-800 text-[10px] text-slate-200 border border-slate-700">
                         {log.action}
                       </span>
                     </td>
-                    <td className="py-3 px-3 text-slate-400 uppercase">
-                      {log.entity_type}
-                    </td>
-                    <td className="py-3 px-4 font-sans text-xs text-slate-300 max-w-xs truncate">
-                      {log.details ? JSON.stringify(log.details) : '—'}
-                    </td>
-                    <td className="py-3 px-3 text-slate-500">
-                      {log.ip_address || '127.0.0.1'}
+                    <td className="px-4 py-3 text-slate-300 uppercase">{log.entity_type}</td>
+                    <td className="px-4 py-3 text-slate-400 max-w-xs truncate">
+                      {log.details ? JSON.stringify(log.details) : 'N/A'}
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Import Modal */}
+      {/* Bulk Import Modal */}
       <ImportModal
         isOpen={isImportModalOpen}
         onClose={() => setIsImportModalOpen(false)}

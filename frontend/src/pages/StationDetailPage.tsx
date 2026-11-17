@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Building, MapPin, Radio, RefreshCw, ArrowLeft, AlertCircle, Layers } from 'lucide-react';
+import { Building, MapPin, Radio, RefreshCw, ArrowLeft, AlertCircle, Layers, CheckCircle2, ShieldCheck, Tag } from 'lucide-react';
 import { Station, StationLiveBoardItem } from '../types';
 import { api } from '../services/api';
 import { LiveBoardTable } from '../components/LiveBoardTable';
@@ -22,11 +22,15 @@ export const StationDetailPage: React.FC<StationDetailPageProps> = ({
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedProvider, setSelectedProvider] = useState<string>('mock');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [error, setError] = useState<string | null>(null);
 
-  const fetchBoard = async (provider = selectedProvider) => {
+  const categories = ['ALL', 'Superfast', 'Express', 'MEMU', 'DEMU', 'Local', 'Passenger', 'Special'];
+
+  const fetchBoard = async (provider = selectedProvider, category = selectedCategory) => {
     try {
       setError(null);
+      const catParam = category !== 'ALL' ? category : undefined;
       const data = await api.getStationLiveBoard(stationCode, provider);
       setStation(data.station);
       setArrivals(data.arrivals || []);
@@ -42,13 +46,28 @@ export const StationDetailPage: React.FC<StationDetailPageProps> = ({
 
   useEffect(() => {
     setLoading(true);
-    fetchBoard(selectedProvider);
+    fetchBoard(selectedProvider, selectedCategory);
   }, [stationCode, selectedProvider]);
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchBoard(selectedProvider);
+    fetchBoard(selectedProvider, selectedCategory);
   };
+
+  const filterTrains = (items: StationLiveBoardItem[]) => {
+    if (selectedCategory === 'ALL') return items;
+    const target = selectedCategory.toLowerCase();
+    return items.filter((item) => {
+      const type = (item.train_type || '').toLowerCase();
+      const cat = (item.train_category || '').toLowerCase();
+      if (target === 'special') return type.includes('special') || cat.includes('special');
+      if (target === 'local') return type.includes('local') || type.includes('emu') || cat.includes('local');
+      return type.includes(target) || cat.includes(target);
+    });
+  };
+
+  const filteredArrivals = filterTrains(arrivals);
+  const filteredDepartures = filterTrains(departures);
 
   if (loading) {
     return (
@@ -123,15 +142,34 @@ export const StationDetailPage: React.FC<StationDetailPageProps> = ({
             </div>
 
             <div>
-              <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
-                <span>{station.name}</span>
-              </h1>
-              <div className="flex items-center gap-3 mt-1 text-xs text-slate-400">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-2xl font-extrabold text-white flex items-center gap-2">
+                  <span>{station.name}</span>
+                </h1>
+                {station.category && (
+                  <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    {station.category}
+                  </span>
+                )}
+                {station.operational_status && (
+                  <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-950/60 text-emerald-400 border border-emerald-800/60 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {station.operational_status}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mt-1 text-xs text-slate-400 flex-wrap">
                 <span className="font-mono text-amber-400 font-semibold">{station.zone} Zone</span>
                 {station.division && (
                   <>
                     <span>•</span>
                     <span>{station.division} Division</span>
+                  </>
+                )}
+                {station.district && (
+                  <>
+                    <span>•</span>
+                    <span>District: {station.district}</span>
                   </>
                 )}
                 {station.state && (
@@ -141,6 +179,24 @@ export const StationDetailPage: React.FC<StationDetailPageProps> = ({
                   </>
                 )}
               </div>
+
+              {/* Station Facilities Tags */}
+              {station.facilities && station.facilities.length > 0 && (
+                <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+                  <span className="text-[10px] text-slate-500 uppercase font-semibold flex items-center gap-1">
+                    <Tag className="w-3 h-3 text-slate-500" />
+                    Facilities:
+                  </span>
+                  {station.facilities.map((fac) => (
+                    <span
+                      key={fac}
+                      className="px-2 py-0.5 rounded bg-slate-800/90 text-slate-300 text-[10px] font-medium border border-slate-700/60"
+                    >
+                      {fac}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -180,18 +236,44 @@ export const StationDetailPage: React.FC<StationDetailPageProps> = ({
           </div>
 
           <div>
-            <div className="text-[10px] uppercase font-mono text-slate-500">Active Express Trains</div>
+            <div className="text-[10px] uppercase font-mono text-slate-500">Active Scheduled Trains</div>
             <div className="text-amber-400 font-bold mt-0.5 text-sm">
-              {arrivals.length + departures.length} Passing Daily
+              {arrivals.length + departures.length} Calling at Station
             </div>
           </div>
         </div>
       </div>
 
+      {/* Category Filter Pills for Live Board */}
+      <div className="flex items-center justify-between gap-4 flex-wrap bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-xs text-slate-400 flex items-center gap-1 mr-1 font-semibold">
+            <Layers className="w-3.5 h-3.5 text-amber-400" />
+            Filter Services:
+          </span>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors ${
+                selectedCategory === cat
+                  ? 'bg-amber-500 text-slate-950 font-bold shadow-sm'
+                  : 'bg-slate-800 text-slate-400 hover:text-white border border-slate-700'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        <span className="text-xs font-mono text-slate-500">
+          Showing {filteredArrivals.length} arrivals, {filteredDepartures.length} departures
+        </span>
+      </div>
+
       {/* Live Board Table */}
       <LiveBoardTable
-        arrivals={arrivals}
-        departures={departures}
+        arrivals={filteredArrivals}
+        departures={filteredDepartures}
         onSelectTrain={onSelectTrain}
         stationName={`${station.name} (${station.code})`}
       />

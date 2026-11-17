@@ -22,12 +22,14 @@ router = APIRouter(prefix="/trains", tags=["Trains"])
 
 @router.get("")
 def get_trains(
-    query: Optional[str] = Query(None, description="Search by train number or name"),
-    source: Optional[str] = Query(None, description="Source station code"),
-    destination: Optional[str] = Query(None, description="Destination station code"),
-    station: Optional[str] = Query(None, description="Passing/halting station code"),
+    query: Optional[str] = Query(None, description="Search by train number, name, or 'Source to Dest'"),
+    source: Optional[str] = Query(None, description="Source station code or name"),
+    destination: Optional[str] = Query(None, description="Destination station code or name"),
+    station: Optional[str] = Query(None, description="Passing/halting station code or name"),
     train_type: Optional[str] = Query(None, description="Rajdhani, Vande Bharat, Shatabdi, etc."),
+    category: Optional[str] = Query(None, description="MEMU, DEMU, Local, Superfast, Express, Passenger, Special, etc."),
     day: Optional[str] = Query(None, description="Running day e.g. Mon, Tue"),
+    is_special: Optional[bool] = Query(None, description="Filter festival/holiday special trains"),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db)
@@ -40,7 +42,9 @@ def get_trains(
         destination=destination,
         station=station,
         train_type=train_type,
+        category=category,
         day=day,
+        is_special=is_special,
         limit=limit,
         offset=offset
     )

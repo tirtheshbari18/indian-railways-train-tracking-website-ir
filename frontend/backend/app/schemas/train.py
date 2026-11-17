@@ -24,21 +24,29 @@ class StopResponse(StopBase):
 class TrainBase(BaseModel):
     train_number: str = Field(..., min_length=4, max_length=10)
     train_name: str = Field(..., min_length=2, max_length=150)
+    train_category: str = "Superfast" # "MEMU", "DEMU", "EMU", "Local", "Superfast", "Express", "Passenger", "Mail Express", "Weekly", "Special"
     train_type: str = "Superfast"
     source_station_code: str
     destination_station_code: str
-    running_days: str = "1111111"  # Mon-Sun mask or days
+    running_days: str = "1111111"  # Mon-Sun mask e.g. "1111111"
     total_distance_km: float = 0.0
     duration_minutes: int = 0
     classes: List[str] = ["1A", "2A", "3A", "SL"]
-    pantry_car: bool = True
+    pantry_car: bool = False
     return_train_number: Optional[str] = None
+    validity_start: Optional[str] = None
+    validity_end: Optional[str] = None
+    is_special: bool = False
+    is_active: bool = True
+    source_of_data: Optional[str] = "CRIS / NTES Official Timetable"
+    last_verified_date: Optional[str] = None
 
 class TrainCreate(TrainBase):
     stops: Optional[List[StopCreate]] = None
 
 class TrainUpdate(BaseModel):
     train_name: Optional[str] = None
+    train_category: Optional[str] = None
     train_type: Optional[str] = None
     source_station_code: Optional[str] = None
     destination_station_code: Optional[str] = None
@@ -48,6 +56,10 @@ class TrainUpdate(BaseModel):
     classes: Optional[List[str]] = None
     pantry_car: Optional[bool] = None
     return_train_number: Optional[str] = None
+    validity_start: Optional[str] = None
+    validity_end: Optional[str] = None
+    is_special: Optional[bool] = None
+    is_active: Optional[bool] = None
 
 class TrainResponse(TrainBase):
     id: int
@@ -64,5 +76,8 @@ class TrainSearchQuery(BaseModel):
     source: Optional[str] = None
     destination: Optional[str] = None
     station: Optional[str] = None
+    category: Optional[str] = None # "MEMU", "DEMU", "Local", "Superfast", etc.
     train_type: Optional[str] = None
     day: Optional[str] = None
+    page: int = 1
+    page_size: int = 50

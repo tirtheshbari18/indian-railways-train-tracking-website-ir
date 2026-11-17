@@ -3,26 +3,34 @@ from typing import Optional, List
 from pydantic import BaseModel, Field, ConfigDict
 
 class StationBase(BaseModel):
-    code: str = Field(..., min_length=2, max_length=10, description="Station code e.g. NDLS")
+    code: str = Field(..., min_length=2, max_length=10, description="Station code e.g. NDLS, BOR, DRD")
     name: str = Field(..., min_length=2, max_length=100)
+    state: Optional[str] = None
+    district: Optional[str] = None
     division: Optional[str] = None
     zone: Optional[str] = None
-    state: Optional[str] = None
     latitude: float
     longitude: float
+    category: Optional[str] = "Regular" # "Junction", "Terminal", "Suburban", "Regular", "Halt"
     platforms_count: Optional[int] = 1
+    facilities: Optional[List[str]] = []
+    operational_status: Optional[str] = "Operational"
 
 class StationCreate(StationBase):
     pass
 
 class StationUpdate(BaseModel):
     name: Optional[str] = None
+    state: Optional[str] = None
+    district: Optional[str] = None
     division: Optional[str] = None
     zone: Optional[str] = None
-    state: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
+    category: Optional[str] = None
     platforms_count: Optional[int] = None
+    facilities: Optional[List[str]] = None
+    operational_status: Optional[str] = None
 
 class StationResponse(StationBase):
     created_at: datetime
@@ -31,6 +39,7 @@ class StationResponse(StationBase):
 class StationLiveBoardItem(BaseModel):
     train_number: str
     train_name: str
+    train_category: str = "Superfast" # "MEMU", "DEMU", "Local", "Superfast", etc.
     train_type: str
     source_station_code: str
     destination_station_code: str
@@ -49,3 +58,4 @@ class StationLiveBoardItem(BaseModel):
 class StationDetailResponse(StationResponse):
     arrivals: List[StationLiveBoardItem] = []
     departures: List[StationLiveBoardItem] = []
+    total_trains_count: int = 0

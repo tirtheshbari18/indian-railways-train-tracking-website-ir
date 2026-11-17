@@ -13,6 +13,9 @@ def list_stations(
     query: Optional[str] = None,
     zone: Optional[str] = None,
     state: Optional[str] = None,
+    division: Optional[str] = None,
+    category: Optional[str] = None,
+    operational_status: Optional[str] = None,
     limit: int = 50,
     offset: int = 0
 ) -> List[Station]:
@@ -22,13 +25,20 @@ def list_stations(
         q = q.filter(
             or_(
                 Station.code.ilike(search),
-                Station.name.ilike(search)
+                Station.name.ilike(search),
+                Station.district.ilike(search)
             )
         )
     if zone:
         q = q.filter(Station.zone.ilike(zone.strip()))
     if state:
         q = q.filter(Station.state.ilike(state.strip()))
+    if division:
+        q = q.filter(Station.division.ilike(division.strip()))
+    if category:
+        q = q.filter(Station.category.ilike(category.strip()))
+    if operational_status:
+        q = q.filter(Station.operational_status.ilike(operational_status.strip()))
 
     return q.order_by(Station.code).offset(offset).limit(limit).all()
 
@@ -39,6 +49,7 @@ def get_station_by_code(db: Session, station_code: str) -> Optional[Station]:
 def get_station_live_board(
     db: Session,
     station_code: str,
+    category: Optional[str] = None,
     provider_override: Optional[str] = None
 ) -> Dict[str, Any]:
     station = get_station_by_code(db, station_code)
@@ -49,12 +60,39 @@ def get_station_live_board(
         )
 
     # Find all stops passing through this station
-    stops = (
+    q_stops = (
         db.query(Stop)
         .join(Train, Stop.train_id == Train.id)
         .filter(Stop.station_code == station.code)
-        .all()
     )
+
+    if category:
+        cat_lower = category.strip().lower()
+        if cat_lower in ["local", "emu"]:
+            q_stops = q_stops.filter(
+                or_(
+                    Train.train_category.ilike("%Local%"),
+                    Train.train_category.ilike("%EMU%"),
+                    Train.train_type.ilike("%Local%"),
+                    Train.train_type.ilike("%EMU%")
+                )
+            )
+        elif cat_lower in ["memu", "demu"]:
+            q_stops = q_stops.filter(
+                or_(
+                    Train.train_category.ilike(f"%{category.strip()}%"),
+                    Train.train_type.ilike(f"%{category.strip()}%")
+                )
+            )
+        else:
+            q_stops = q_stops.filter(
+                or_(
+                    Train.train_category.ilike(f"%{category.strip()}%"),
+                    Train.train_type.ilike(f"%{category.strip()}%")
+                )
+            )
+
+    stops = q_stops.all()
 
     provider = get_tracking_provider(provider_override)
     board = provider.get_station_live_board(station, stops)
@@ -77,11 +115,15 @@ def create_station(db: Session, data: StationCreate) -> Station:
     station = Station(
         code=code,
         name=data.name.strip(),
+        district=data.district,
         division=data.division,
         zone=data.zone,
         state=data.state,
         latitude=data.latitude,
         longitude=data.longitude,
+        category=data.category or "Regular",
+        facilities=data.facilities,
+        operational_status=data.operational_status or "Operational",
         platforms_count=data.platforms_count or 1
     )
     db.add(station)
